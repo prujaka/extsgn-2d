@@ -11,3 +11,5 @@ rm *mod*
 mv $exefile ../$exefile
 cd ..
 ./exe
+
+gnuplot plot2d.gnu

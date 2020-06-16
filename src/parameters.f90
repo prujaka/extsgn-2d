@@ -1,9 +1,9 @@
 module parameters
   implicit none
+  integer, parameter       :: NX        = 50
+  integer, parameter       :: NY        = 50
   integer, parameter       :: NEQS      = 5
   integer, parameter       :: DP        = kind(1.0d0)
-  integer, parameter       :: NX        = 5
-  integer, parameter       :: NY        = 5
   real(kind=DP), parameter :: XLEFT     = -300.0d0
   real(kind=DP), parameter :: XRIGHT    = 300.0d0
   real(kind=DP), parameter :: XMID      = 0.0d0
