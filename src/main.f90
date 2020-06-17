@@ -1,5 +1,6 @@
 program extsgn_imex2d
   use parameters
+  use aux
   use methods
   implicit none
   integer :: i,j,k
@@ -13,14 +14,7 @@ program extsgn_imex2d
 
   call set_mesh(x,y)
   call set_ic_rpx(x,prim)
-
-  open(unit=10,file=OUTPUT_FILE)
-  do i=1, NY
-    do j=1, NX
-      write(10,*) x(i), y(j), (prim(k,i,j), k=1,NEQS), time
-    enddo
-  enddo
-  close(10)
+  call output_solution(OUTPUT_FILE,x,y,prim,time)
 
   deallocate(x,y,prim)
 

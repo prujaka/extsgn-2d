@@ -1,5 +1,6 @@
 module methods
   use parameters
+  use aux
   implicit none
   contains
 
