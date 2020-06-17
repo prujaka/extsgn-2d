@@ -19,7 +19,7 @@ module methods
     enddo
 
     return
-  end
+  end subroutine set_mesh
 
   subroutine set_ic_rpx(x,prim)
     use parameters
@@ -47,6 +47,50 @@ module methods
     enddo
 
     return
-  end
+  end subroutine set_ic_rpx
+
+  subroutine prim_to_cons(prim,cons)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: cons(NEQS,0:NX+1,0:NY+1)
+    integer :: k
+
+    cons(1,:,:) = prim(1,:,:)
+    do k=2, NEQS
+      cons(k,:,:) = cons(1,:,:)*prim(k,:,:)
+    enddo
+
+    return
+  end subroutine prim_to_cons
+
+  subroutine cons_to_prim(cons,prim)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
+    integer :: k
+
+    prim(1,:,:) = cons(1,:,:)
+    do k=2, NEQS
+      prim(k,:,:) = cons(k,:,:)/prim(1,:,:)
+    enddo
+
+    return
+  end subroutine cons_to_prim
+
+  subroutine set_bc_neumann_1d(N,array)
+    use parameters
+    implicit none
+    integer, intent(in) :: N
+    real(kind=DP), intent(inout) :: array(NEQS,0:N+1)
+
+    array(:,0) = array(:,1)
+    array(:,N+1) = array(:,N)
+
+    return
+  end subroutine set_bc_neumann_1d
+
+
 
 end module methods
