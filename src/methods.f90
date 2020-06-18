@@ -79,7 +79,40 @@ module methods
     return
   end subroutine cons_to_prim
 
-  subroutine set_bc_neumann_1d(N,array)
+  subroutine set_bc(prim)
+    use parameters
+    implicit none
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+
+    call set_bc_x(prim)
+    call set_bc_y(prim)
+
+    return
+  end subroutine set_bc
+  subroutine set_bc_x(prim)
+    use parameters
+    implicit none
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    integer :: j
+
+    do j=1, NY
+      call set_bc_1d_prims_neumann(NX,prim(:,:,j))
+    enddo
+    return
+  end subroutine set_bc_x
+  subroutine set_bc_y(prim)
+    use parameters
+    implicit none
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    integer :: i
+
+    do i=1, NX
+      call set_bc_1d_prims_neumann(NY,prim(:,i,:))
+    enddo
+
+    return
+  end subroutine set_bc_y
+  subroutine set_bc_1d_prims_neumann(N,array)
     use parameters
     implicit none
     integer, intent(in) :: N
@@ -89,8 +122,7 @@ module methods
     array(:,N+1) = array(:,N)
 
     return
-  end subroutine set_bc_neumann_1d
-
+  end subroutine set_bc_1d_prims_neumann
 
 
 end module methods

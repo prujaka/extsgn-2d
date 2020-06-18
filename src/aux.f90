@@ -6,7 +6,7 @@ contains
   subroutine output_solution(filename,x,y,prim,time)
     use parameters
     implicit none
-    character(len=7), intent(in) :: filename
+    character(len=OUTPUT_FILENAME_LENGTH), intent(in) :: filename
     real(kind=DP), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(in) :: time
     integer :: i,k,j
@@ -20,5 +20,20 @@ contains
     close(10)
     return
   end subroutine output_solution
+
+  subroutine output_single_prim_matrix(filename,array)
+    use parameters
+    implicit none
+    character(len=OUTPUT_FILENAME_LENGTH), intent(in) :: filename
+    real(kind=DP), intent(in) :: array(0:NX+1,0:NY+1)
+    integer :: i, j
+
+    open(unit=10,file=filename)
+    do j=0, NX+1
+      write(10,*) (array(i,j), i=0,NX+1)
+    enddo
+    close(10)
+    return
+  end subroutine output_single_prim_matrix
 
 end module aux

@@ -1,7 +1,7 @@
 module parameters
   implicit none
-  integer, parameter       :: NX        = 10
-  integer, parameter       :: NY        = 10
+  integer, parameter       :: NX        = 2
+  integer, parameter       :: NY        = 2
   integer, parameter       :: NEQS      = 5
   integer, parameter       :: DP        = kind(1.0d0)
   real(kind=DP), parameter :: XLEFT     = -300.0d0
@@ -27,5 +27,6 @@ module parameters
   real(kind=DP), parameter :: WR_INIT   = 0.0d0
 
   character(LEN=7), parameter :: OUTPUT_FILE = 'res.out'
+  integer, parameter          :: OUTPUT_FILENAME_LENGTH = 7
 
 end module parameters

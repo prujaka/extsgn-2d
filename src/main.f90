@@ -15,8 +15,10 @@ program extsgn_imex2d
   call set_mesh(x,y)
   call set_ic_rpx(x,prim)
   call prim_to_cons(prim,cons)
-  call cons_to_prim(cons,prim)
   call output_solution(OUTPUT_FILE,x,y,prim,time)
+
+  call set_bc(prim)
+  call output_single_prim_matrix('boundar',prim(1,:,:))
 
   deallocate(x,y,prim)
 
