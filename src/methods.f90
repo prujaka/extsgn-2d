@@ -1,5 +1,6 @@
 module methods
   use parameters
+  use model
   use aux
   implicit none
   contains
@@ -124,5 +125,125 @@ module methods
     return
   end subroutine set_bc_1d_prims_neumann
 
+  ! subroutine riemann_fluxes_x()
+  !
+  !   do j=1,Ny
+  !     do i=0,Nx
+  !
+  !     enddo
+  !   enddo
+  !
+  !   return
+  ! end subroutine riemann_fluxes_x
+
+  ! subroutine riemann_fluxes_oned(Ncells,h,u,eta,w,F,cmax)
+  !   use parameters
+  !   use solvers
+  !   implicit none
+  !   integer, intent(in) :: Ncells
+  !   real(kind=DP), dimension(0:Ncells+1), intent(in) :: h,u,eta,w
+  !   real(kind=DP), dimension(0:Ncells+1,NEQS), intent(out) :: F
+  !   real(kind=DP), intent(inout) :: cmax
+  !   real(kind=DP) :: hl,ul,etal,wl,hr,ur,etar,wr,f1,f2,f3,f4
+  !   integer :: i
+  !
+  !   cmax=0.0d0
+  !   do i=0,Ncells
+  !     hl=h(i)
+  !     ul=u(i)
+  !     etal=eta(i)
+  !     wl=w(i)
+  !
+  !     hr=h(i+1)
+  !     ur=u(i+1)
+  !     etar=eta(i+1)
+  !     wr=w(i+1)
+  !
+  !     call hllc(hl,ul,etal,wl,hr,ur,etar,wr,f1,f2,f3,f4,cmax)
+  !     ! print*, cmax
+  !
+  !     F(i,1) = f1
+  !     F(i,2) = f2
+  !     F(i,3) = f3
+  !     F(i,4) = f4
+  !   enddo
+  !   return
+  ! end subroutine riemann_fluxes_oned
+
+  subroutine hllc(priml,primr,F,cmax)
+    use parameters
+    use model
+    implicit none
+    real(kind=DP), intent(in) :: priml(NEQS), primr(NEQS)
+    real(kind=DP), intent(out) :: F(NEQS)
+    real(kind=DP), intent(inout) :: cmax
+    real(kind=DP) :: rhol, rhor, ul, ur, etal, etar, pl, pr, al, ar
+    real(kind=DP) :: sl, sr, sl1, sl2, sr1, sr2, smid
+    real(kind=DP) :: rhostarl, rhostarr
+    real(kind=DP), dimension(NEQS) :: consl, consr, Fl, Fr
+    real(kind=DP), dimension(NEQS) :: consstarl, consstarr, Fstarl, Fstarr
+    integer :: k
+
+    rhol = priml(1); rhor = primr(1)
+    ul   = priml(2); ur   = primr(2)
+    etal = priml(4); etar = primr(4)
+
+    pl = get_p(rhol, etal); pr = get_p(rhor, etar)
+    al = get_a(rhol, etal); ar = get_a(rhor, etar)
+
+    print*, 'hl:', rhol
+    print*, 'hl:', rhor
+
+    ! Wave speed estimation
+  	! Davis S.F.(1988), 'Simplified second order Godunov type methods',
+  	! SIAM J. Sci. and Stat. Comput., N3, 445-473.
+		sl1=ul-al; sl2=ur-ar
+		sr1=ul+al; sr2=ur+ar
+		sl=DMIN1(sl1,sl2); sr=DMAX1(sr1,sr2)
+		cmax = DMAX1(cmax,sl,sr)
+
+    consl(1) = rhol; consr(1) = rhor
+    do k=2, NEQS
+      consl(k) = rhol*priml(k)
+      consr(k) = rhor*primr(k)
+    enddo
+
+    Fl(:) = consl(:)*ul
+    Fr(:) = consr(:)*ur
+    Fl(2) = Fl(2) + pl
+    Fr(2) = Fr(2) + pr
+
+    ! Smid
+		! Massoni, J. (1999). Un Modèle Micromécanique pour l'Initiation par
+		! Choc et la Transition vers la Détonation dans les Matériaux Solides
+		! Hautement Energétiques (Thèse).
+		smid = (sr*Fr(1)-sl*Fl(1)+Fl(2)-Fr(2))/(sr*rhor-sl*rhol+Fl(1)-Fr(1))
+
+    rhostarl = rhol*(sl-ul)/(sl-smid)
+    rhostarr = rhor*(sr-ur)/(sr-smid)
+    consstarl(1) = rhostarl
+    consstarr(1) = rhostarr
+    consstarl(2) = rhostarl*smid
+    consstarr(2) = rhostarr*smid
+    do k=3, NEQS
+      consstarl(k) = rhostarl*priml(k)
+      consstarr(k) = rhostarr*primr(k)
+    enddo
+
+    Fstarl(:)=Fl(:)+sl*(consstarl(:)-consl(:))
+    Fstarr(:)=Fr(:)+sr*(consstarr(:)-consr(:))
+
+    if (0.0d0<sl) then
+			F(:) = Fl(:)
+		elseif (sr<0.0d0) then
+			F(:) = Fr(:)
+		elseif(0.0d0<=smid) then
+			F(:)=Fstarl(:)
+		else
+			F(:)=Fstarr(:)
+		endif
+
+    return
+  end subroutine hllc
 
 end module methods
