@@ -29,7 +29,7 @@ contains
     integer :: i, j
 
     open(unit=10,file=filename)
-    do j=0, NX+1
+    do j=0, NY+1
       write(10,*) (array(i,j), i=0,NX+1)
     enddo
     close(10)

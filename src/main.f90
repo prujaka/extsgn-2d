@@ -10,6 +10,8 @@ program extsgn_imex2d
   real(kind=DP), allocatable :: x(:), y(:)
   real(kind=DP), allocatable :: prim(:,:,:), cons(:,:,:), sources(:,:,:)
   real(kind=DP), allocatable :: Fflux(:,:,:), Gflux(:,:,:)
+  real(kind=DP) :: priml(NEQS), primr(NEQS)
+  character(len=20) :: fmt
 
   allocate(x(0:NX+1), y(0:NY+1))
   allocate(prim(NEQS, 0:NX+1, 0:NY+1), cons(NEQS, 0:NX+1, 0:NY+1))
@@ -21,11 +23,11 @@ program extsgn_imex2d
   call prim_to_cons(prim,cons)
   call output_solution(OUTPUT_FILE,x,y,prim,time)
 
-  call set_bc(prim)
-  call output_single_prim_matrix('boundar',prim(1,:,:))
+  call riemann_fluxes_x(prim,Fflux,cmax)
 
-  call hllc(prim(:,1,1),prim(:,2,1),Fflux(:,1,1),cmax)
-  write(*,*) (Fflux(k,1,1), k=1, NEQS)
+  data priml /1,2,3,4,5/
+  write(fmt,"(A1,I0,A7)") '(',NEQS,'(F7.3))'
+  write(*,fmt) (Fflux(k,3,1), k=1,NEQS)
 
   deallocate(x,y,prim)
 

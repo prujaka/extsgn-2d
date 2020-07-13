@@ -125,50 +125,42 @@ module methods
     return
   end subroutine set_bc_1d_prims_neumann
 
-  ! subroutine riemann_fluxes_x()
-  !
-  !   do j=1,Ny
-  !     do i=0,Nx
-  !
-  !     enddo
-  !   enddo
-  !
-  !   return
-  ! end subroutine riemann_fluxes_x
+  subroutine riemann_fluxes_x(prim,flux,cmax)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
+    real(kind=DP), dimension(NEQS) :: priml, primr, F
+    integer :: i,j
 
-  ! subroutine riemann_fluxes_oned(Ncells,h,u,eta,w,F,cmax)
-  !   use parameters
-  !   use solvers
-  !   implicit none
-  !   integer, intent(in) :: Ncells
-  !   real(kind=DP), dimension(0:Ncells+1), intent(in) :: h,u,eta,w
-  !   real(kind=DP), dimension(0:Ncells+1,NEQS), intent(out) :: F
-  !   real(kind=DP), intent(inout) :: cmax
-  !   real(kind=DP) :: hl,ul,etal,wl,hr,ur,etar,wr,f1,f2,f3,f4
-  !   integer :: i
-  !
-  !   cmax=0.0d0
-  !   do i=0,Ncells
-  !     hl=h(i)
-  !     ul=u(i)
-  !     etal=eta(i)
-  !     wl=w(i)
-  !
-  !     hr=h(i+1)
-  !     ur=u(i+1)
-  !     etar=eta(i+1)
-  !     wr=w(i+1)
-  !
-  !     call hllc(hl,ul,etal,wl,hr,ur,etar,wr,f1,f2,f3,f4,cmax)
-  !     ! print*, cmax
-  !
-  !     F(i,1) = f1
-  !     F(i,2) = f2
-  !     F(i,3) = f3
-  !     F(i,4) = f4
-  !   enddo
-  !   return
-  ! end subroutine riemann_fluxes_oned
+    cmax = 0.0d0
+    do j=1,Ny
+      do i=0,Nx
+        priml = prim(:,i,j)
+        primr = prim(:,i+1,j)
+        call hllc(priml,primr,F,cmax)
+        flux(:,i,j) = F
+      enddo
+    enddo
+
+    return
+  end subroutine riemann_fluxes_x
+
+  subroutine godunov(cons,Fflux,Gflux)
+    implicit none
+
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: Fflux,Gflux
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: cons
+    integer :: i,j
+
+    do j=1,Ny
+      do i=1,Nx
+        cons(i,j,:)=cons(i,j,:)-dt/dV*( dy*(Fflux(i,j,:)-Fflux(i-1,j,:))&
+                                       +dx*(Gflux(i,j,:)-Gflux(i,j-1,:)) )
+      enddo
+    enddo
+    return
+  end subroutine godunov
 
   subroutine hllc(priml,primr,F,cmax)
     use parameters
@@ -190,9 +182,6 @@ module methods
 
     pl = get_p(rhol, etal); pr = get_p(rhor, etar)
     al = get_a(rhol, etal); ar = get_a(rhor, etar)
-
-    print*, 'hl:', rhol
-    print*, 'hl:', rhor
 
     ! Wave speed estimation
   	! Davis S.F.(1988), 'Simplified second order Godunov type methods',
