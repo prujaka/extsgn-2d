@@ -80,6 +80,30 @@ module methods
     return
   end subroutine cons_to_prim
 
+  subroutine timestep_firstorder(prim,cons)
+    use parameters
+    use model
+    implicit none
+    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: Fflux,Gflux,S
+    real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
+    real(kind=DP) :: cmax = 0.0d0
+
+    Gflux = 0.0d0
+    call set_bc(prim)
+    call riemann_fluxes_x(prim,Fflux,cmax)
+    dt=CFL*DX/cmax
+    call godunov(cons,Fflux,Gflux)
+    call get_prims_gn(prim,h,u,v,eta,w)
+    call ode_exact_solution(h,u,v,eta,w)
+    call make_sources(h,eta,w,S)
+    call ode_euler_step(S,cons)
+    call cons_to_prim(cons,prim)
+
+    return
+  end subroutine timestep_firstorder
+
   subroutine set_bc(prim)
     use parameters
     implicit none
@@ -133,7 +157,6 @@ module methods
     real(kind=DP), dimension(NEQS) :: priml, primr, F
     integer :: i,j
 
-    cmax = 0.0d0
     do j=1,Ny
       do i=0,Nx
         priml = prim(:,i,j)
@@ -147,6 +170,7 @@ module methods
   end subroutine riemann_fluxes_x
 
   subroutine godunov(cons,Fflux,Gflux)
+    use parameters
     implicit none
 
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: Fflux,Gflux
@@ -161,6 +185,16 @@ module methods
     enddo
     return
   end subroutine godunov
+
+	subroutine ode_euler_step(S,cons)
+		use parameters
+		implicit none
+		real(kind=DP), intent(in) :: S(NEQS,0:NX+1,0:NY+1)
+		real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+
+		cons(:,:,:) = cons(:,:,:) + dt * S(:,:,:)
+		return
+	end subroutine ode_euler_step
 
   subroutine hllc(priml,primr,F,cmax)
     use parameters

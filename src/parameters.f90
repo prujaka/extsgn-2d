@@ -1,20 +1,23 @@
 module parameters
   implicit none
-  integer, parameter       :: NX        = 5
-  integer, parameter       :: NY        = 2
+  integer, parameter       :: NX        = 50
+  integer, parameter       :: NY        = 1
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 3
   integer, parameter       :: DP        = kind(1.0d0)
+  integer, parameter       :: ITFINAL   = 100000000
+  real(kind=dp), parameter :: TIMEFINAL = 0.5d0
+  real(kind=dp), parameter :: CFL       = 0.5d0
+  real(kind=dp), parameter :: LAMBDA    = 1.0d-8
   real(kind=DP), parameter :: XLEFT     = -300.0d0
   real(kind=DP), parameter :: XRIGHT    = 300.0d0
   real(kind=DP), parameter :: XMID      = 0.0d0
   real(kind=DP), parameter :: YLEFT     = -300.0d0
   real(kind=DP), parameter :: YRIGHT    = 300.0d0
   real(kind=DP), parameter :: YMID      = 0.0d0
+  real(kind=dp), parameter :: GG        = 9.81d0
   real(kind=DP), parameter :: DX        = (XRIGHT-XLEFT) / DFLOAT(NX)
   real(kind=DP), parameter :: DY        = (YRIGHT-YLEFT) / DFLOAT(NY)
   real(kind=DP), parameter :: DV        = DX*DY
-  real(kind=dp), parameter :: GG        = 9.81d0
-  real(kind=dp), parameter :: LAMBDA    = 1.0d0
   real(kind=DP)            :: dt        = 1.0d-8
 
   real(kind=DP), parameter :: HL_INIT   = 1.8d0
