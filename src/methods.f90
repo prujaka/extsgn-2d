@@ -80,74 +80,48 @@ module methods
     return
   end subroutine cons_to_prim
 
-  subroutine timestep_firstorder(prim,cons)
-    use parameters
-    use model
-    implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: Fflux,Gflux,S
-    real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
-    real(kind=DP) :: cmax = 0.0d0
-
-    Gflux = 0.0d0
-    call set_bc(prim)
-    call riemann_fluxes_x(prim,Fflux,cmax)
-    dt=CFL*DX/cmax
-    call godunov(cons,Fflux,Gflux)
-    call get_prims_gn(prim,h,u,v,eta,w)
-    call ode_exact_solution(h,u,v,eta,w)
-    call make_sources(h,eta,w,S)
-    call ode_euler_step(S,cons)
-    call cons_to_prim(cons,prim)
-
-    return
-  end subroutine timestep_firstorder
+  ! subroutine timestep_firstorder(prim,cons)
+  !   use parameters
+  !   use model
+  !   implicit none
+  !   real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+  !   real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+  !   real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: Fflux,Gflux,S
+  !   real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
+  !   real(kind=DP) :: cmax = 0.0d0
+  !
+  !   Gflux = 0.0d0
+  !   call set_bc(prim)
+  !   call riemann_fluxes_x(prim,Fflux,cmax)
+  !   dt=CFL*DX/cmax
+  !   call godunov(cons,Fflux,Gflux)
+  !   call get_prims_gn(prim,h,u,v,eta,w)
+  !   call ode_exact_solution(h,u,v,eta,w)
+  !   call make_sources(h,eta,w,S)
+  !   call ode_euler_step(S,cons)
+  !   call cons_to_prim(cons,prim)
+  !
+  !   return
+  ! end subroutine timestep_firstorder
 
   subroutine set_bc(prim)
     use parameters
     implicit none
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    integer :: i,j
 
-    call set_bc_x(prim)
-    call set_bc_y(prim)
+    do i=1,NX
+      prim(:,i,0) = prim(:,i,1)
+      prim(:,i,NY+1) = prim(:,i,NY)
+    enddo
+    do j=1,NY
+      prim(:,0,j) = prim(:,1,j)
+      prim(:,NX+1,j) = prim(:,NX,j)
+    enddo
+
 
     return
   end subroutine set_bc
-  subroutine set_bc_x(prim)
-    use parameters
-    implicit none
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    integer :: j
-
-    do j=1, NY
-      call set_bc_1d_prims_neumann(NX,prim(:,:,j))
-    enddo
-    return
-  end subroutine set_bc_x
-  subroutine set_bc_y(prim)
-    use parameters
-    implicit none
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    integer :: i
-
-    do i=1, NX
-      call set_bc_1d_prims_neumann(NY,prim(:,i,:))
-    enddo
-
-    return
-  end subroutine set_bc_y
-  subroutine set_bc_1d_prims_neumann(N,array)
-    use parameters
-    implicit none
-    integer, intent(in) :: N
-    real(kind=DP), intent(inout) :: array(NEQS,0:N+1)
-
-    array(:,0) = array(:,1)
-    array(:,N+1) = array(:,N)
-
-    return
-  end subroutine set_bc_1d_prims_neumann
 
   subroutine riemann_fluxes_x(prim,flux,cmax)
     use parameters
@@ -157,10 +131,12 @@ module methods
     real(kind=DP), dimension(NEQS) :: priml, primr, F
     integer :: i,j
 
-    do j=1,Ny
+    do j=1,NY
+      cmax = 0.0d0
       do i=0,Nx
         priml = prim(:,i,j)
         primr = prim(:,i+1,j)
+        ! print*, i, primr
         call hllc(priml,primr,F,cmax)
         flux(:,i,j) = F
       enddo
@@ -179,8 +155,8 @@ module methods
 
     do j=1,Ny
       do i=1,Nx
-        cons(i,j,:)=cons(i,j,:)-dt/dV*( dy*(Fflux(i,j,:)-Fflux(i-1,j,:))&
-                                       +dx*(Gflux(i,j,:)-Gflux(i,j-1,:)) )
+        cons(:,i,j)=cons(:,i,j)-dt/dV*( dy*(Fflux(:,i,j)-Fflux(:,i-1,j))&
+                                       +dx*(Gflux(:,i,j)-Gflux(:,i,j-1)) )
       enddo
     enddo
     return
