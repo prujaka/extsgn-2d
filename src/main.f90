@@ -20,7 +20,7 @@ program extsgn_imex2d
   call output_solution(OUTPUT_FILE,x,y,prim,time)
 
   call cpu_time(t2)
-  
+
   call print_output_message(it,time,t1,t2,cmax)
 
   deallocate(x,y,prim,cons)

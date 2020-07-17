@@ -13,8 +13,7 @@ module methods
     integer, intent(out) :: it
 
     call set_mesh(x,y)
-    ! call set_ic_rpx(x,prim)
-    call set_ic_rpy(y,prim)
+    call set_ic(x,y,prim)
     call prim_to_cons(prim,cons)
     it = 0
     time = 0.0d0
@@ -39,7 +38,22 @@ module methods
     return
   end subroutine set_mesh
 
-  subroutine set_ic_rpx(x,prim)
+  subroutine set_ic(x,y,prim)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
+    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+
+    select case(SELECTOR_IC)
+      case(IC_RP_X)
+        call set_ic_rp_x(x,prim)
+  		case(IC_RP_Y)
+  	    call set_ic_rp_y(y,prim)
+		end select
+    return
+  end subroutine set_ic
+
+  subroutine set_ic_rp_x(x,prim)
     use parameters
     implicit none
     real(kind=DP), intent(in)  :: x(0:NX+1)
@@ -65,8 +79,8 @@ module methods
     enddo
 
     return
-  end subroutine set_ic_rpx
-  subroutine set_ic_rpy(y,prim)
+  end subroutine set_ic_rp_x
+  subroutine set_ic_rp_y(y,prim)
     use parameters
     implicit none
     real(kind=DP), intent(in)  :: y(0:NY+1)
@@ -92,7 +106,7 @@ module methods
     enddo
 
     return
-  end subroutine set_ic_rpy
+  end subroutine set_ic_rp_y
 
   subroutine prim_to_cons(prim,cons)
     use parameters
@@ -176,13 +190,19 @@ module methods
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer :: i,j
 
-    do i=1,NX
-      prim(:,i,0) = prim(:,i,1)
-      prim(:,i,NY+1) = prim(:,i,NY)
-    enddo
     do j=1,NY
       prim(:,0,j) = prim(:,1,j)
+      prim(2,0,j) = BC_U_LEFT*prim(2,1,j)
+
       prim(:,NX+1,j) = prim(:,NX,j)
+      prim(2,NX+1,j) = BC_U_RIGHT*prim(2,NX,j)
+    enddo
+    do i=1,NX
+      prim(:,i,0) = prim(:,i,1)
+      prim(3,i,0) = BC_V_LEFT*prim(3,i,1)
+
+      prim(:,i,NY+1) = prim(:,i,NY)
+      prim(3,i,NY+1) = BC_V_RIGHT*prim(3,i,NY)
     enddo
 
 
@@ -221,22 +241,19 @@ module methods
     cmax = 0.0d0
     do i=1,NX
       do j=0,NY
-        priml(1) = prim(1,i,j)
+        priml = prim(:,i,j)
         priml(2) = prim(3,i,j)
         priml(3) = prim(2,i,j)
-        if (3<NEQS) priml(4:NEQS) = prim(4:NEQS,i,j)
 
-        primr(1) = prim(1,i,j+1)
+        primr = prim(:,i,j+1)
         primr(2) = prim(3,i,j+1)
         primr(3) = prim(2,i,j+1)
-        if (3<NEQS) primr(4:NEQS) = prim(4:NEQS,i,j+1)
 
         call hllc(priml,primr,F,cmax)
 
-        flux(1,i,j) = F(1)
+        flux(:,i,j) = F
         flux(2,i,j) = F(3)
         flux(3,i,j) = F(2)
-        if (3<NEQS) flux(4:NEQS,i,j) = F(4:NEQS)
       enddo
     enddo
 
