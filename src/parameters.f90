@@ -33,15 +33,14 @@ module parameters
   real(kind=DP), parameter :: ETAR_INIT = 1.0d0
   real(kind=DP), parameter :: WR_INIT   = 0.0d0
 
+  integer, parameter     :: IC_RP_X     = 0
+  integer, parameter     :: IC_RP_Y     = 1
+  integer, parameter     :: SELECTOR_IC = IC_RP_Y
+
   real(kind=DP), parameter :: BC_U_LEFT = -1.0d0
   real(kind=DP), parameter :: BC_U_RIGHT= -1.0d0
   real(kind=DP), parameter :: BC_V_LEFT = -1.0d0
   real(kind=DP), parameter :: BC_V_RIGHT= -1.0d0
-
-  integer, parameter       :: IC_RP_X   = 0
-  integer, parameter       :: IC_RP_Y   = 1
-
-  integer, parameter     :: SELECTOR_IC = IC_RP_Y
 
   character(LEN=7), parameter :: OUTPUT_FILE = 'res.out'
   integer, parameter          :: OUTPUT_FILENAME_LENGTH = 7
