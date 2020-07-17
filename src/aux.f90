@@ -36,4 +36,22 @@ contains
     return
   end subroutine output_single_prim_matrix
 
+  subroutine print_output_message(it,time,t1,t2,cmax)
+    use parameters
+    implicit none
+    integer, intent(in) :: it
+    real, intent(in) :: t1,t2
+    real(kind=DP), intent(in) :: time,cmax
+
+    print*, ''
+    write(*,*) 'NX', NX
+    write(*,*) 'Ny', Ny
+    write(*,*) 'time', time
+    write(*,*) 'it', it
+    write(*,*) 'dt', dt
+    write(*,*) 'cmax', cmax
+    write(*,*) 'cpu_time', t2-t1
+    return
+  end subroutine print_output_message
+
 end module aux

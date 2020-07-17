@@ -14,4 +14,5 @@ mv $exefile ../$exefile
 cd ..
 ./exe
 
+gnuplot plot2d.gnu
 gnuplot plot1d.gnu
