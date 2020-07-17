@@ -5,7 +5,7 @@ module parameters
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 3
   integer, parameter       :: DP        = kind(1.0d0)
   integer, parameter       :: ITFINAL   = 100000000
-  real(kind=dp), parameter :: TIMEFINAL = 50.0d0
+  real(kind=dp), parameter :: TIMEFINAL = 120.0d0
   real(kind=dp), parameter :: CFL       = 0.5d0
   real(kind=dp), parameter :: LAMBDA    = 1.0d-8
   real(kind=DP), parameter :: XLEFT     = -300.0d0
@@ -32,6 +32,16 @@ module parameters
   real(kind=DP), parameter :: VR_INIT   = 0.0d0
   real(kind=DP), parameter :: ETAR_INIT = 1.0d0
   real(kind=DP), parameter :: WR_INIT   = 0.0d0
+
+  real(kind=DP), parameter :: BC_U_LEFT = -1.0d0
+  real(kind=DP), parameter :: BC_U_RIGHT= -1.0d0
+  real(kind=DP), parameter :: BC_V_LEFT = -1.0d0
+  real(kind=DP), parameter :: BC_V_RIGHT= -1.0d0
+
+  integer, parameter       :: IC_RP_X   = 0
+  integer, parameter       :: IC_RP_Y   = 1
+
+  integer, parameter     :: SELECTOR_IC = IC_RP_Y
 
   character(LEN=7), parameter :: OUTPUT_FILE = 'res.out'
   integer, parameter          :: OUTPUT_FILENAME_LENGTH = 7
