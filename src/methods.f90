@@ -287,6 +287,126 @@ module methods
 		return
 	end subroutine ode_euler_step
 
+  subroutine muscl_step_x(prim,F,cmax)
+		use parameters
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(inout) :: cmax
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
+
+    call data_reconstruction_x(prim,primr,priml)
+
+    ! call data_reconstruction(h,u,eta,w,hl,ul,etal,wl,hr,ur,etar,wr)
+    ! call set_bc_muscl(hl,ul,etal,wl,hr,ur,etar,wr)
+		! call riemann_fluxes_muscl(hl,ul,etal,wl,hr,ur,etar,wr,F,cmax)
+		return
+	end subroutine muscl_step_x
+
+	subroutine data_reconstruction_x(prim,primr,priml)
+		use parameters
+		implicit none
+		real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+		real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
+    real(kind=DP) :: slope(NEQS,0:NX+1,0:NY+1)
+
+    real(kind=DP) :: slope(0:N+1,NEQS)
+
+    call get_slope(prim,slope)
+
+    primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
+    priml(:,:,:) = prim(:,:,:) + 0.5d0*slope(:,:,:)
+
+		! call get_slope(h,slope(:,1))
+		! call get_slope(u,slope(:,2))
+		! call get_slope(eta,slope(:,3))
+		! call get_slope(w,slope(:,4))
+
+    ! do i=1,N
+		! 	hl(i) = h(i) - 0.5d0*slope(i,1)
+		! 	ul(i) = u(i) - 0.5d0*slope(i,2)
+		! 	etal(i) = eta(i) - 0.5d0*slope(i,3)
+		! 	wl(i) = w(i) - 0.5d0*slope(i,4)
+    !
+		! 	hr(i) = h(i) + 0.5d0*slope(i,1)
+		! 	ur(i) = u(i) + 0.5d0*slope(i,2)
+		! 	etar(i) = eta(i) + 0.5d0*slope(i,3)
+		! 	wr(i) = w(i) + 0.5d0*slope(i,4)
+	  ! enddo
+    return
+	end subroutine data_reconstruction_x
+
+	subroutine get_slope_x(prim,slope)
+		use parameters
+		implicit none
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
+
+    do i=1,NX
+      slope(:,i,:) = 0.5d0*(1.0d0+OMEGA)*(prim(:,i,:) - prim(:,i-1,:))&
+                   + 0.5d0*(1.0d0-OMEGA)*(prim(:,i+1,:) - prim(:,i,:))
+    enddo
+    !
+		! do i=1,N
+		! 	slope(i) = 0.5d0*(1.0d0+OMEGA)*(v(i) - v(i-1))&
+		! 	             + 0.5d0*(1.0d0-OMEGA)*(v(i+1) - v(i))
+		! enddo
+		! print*, slope(0:N+1)
+		return
+	subroutine get_slope_x
+
+	subroutine set_bc_muscl(hl,ul,etal,wl,hr,ur,etar,wr)
+		use parameters
+		implicit none
+		real(kind=DP), dimension(0:N+1), intent(inout) :: hl,ul,etal,wl,&
+		                                                  hr,ur,etar,wr
+
+		hr(0) = hl(1)
+		ur(0) = bcu_left*ul(1)
+		etar(0) = etal(1)
+		wr(0) = wl(1)
+
+		hl(N+1) = hr(N)
+		ul(N+1) = bcu_right*ur(N)
+		etal(N+1) = etar(N)
+		wl(N+1) = wr(N)
+
+		return
+	end
+
+	subroutine riemann_fluxes_muscl(hl,ul,etal,wl,hr,ur,etar,wr,F,cmax)
+		use parameters
+		use solvers
+		implicit none
+		real(kind=DP), dimension(0:N+1), intent(in) :: hl,ul,etal,wl,&
+		                                               hr,ur,etar,wr
+		real(kind=DP), dimension(0:N+1,NEQS), intent(out) :: F
+		real(kind=DP), intent(inout) :: cmax
+		real(kind=DP) :: h_l,u_l,eta_l,w_l,h_r,u_r,eta_r,w_r,f1,f2,f3,f4
+		integer :: i
+
+		cmax=0.0d0
+
+		do i=0,N
+			h_l=hr(i)
+			u_l=ur(i)
+			eta_l=etar(i)
+			w_l=wr(i)
+
+			h_r=hl(i+1)
+			u_r=ul(i+1)
+			eta_r=etal(i+1)
+			w_r=wl(i+1)
+
+			call hllc(h_l,u_l,eta_l,w_l,h_r,u_r,eta_r,w_r,f1,f2,f3,f4,cmax)
+
+			F(i,1) = f1
+			F(i,2) = f2
+			F(i,3) = f3
+			F(i,4) = f4
+		enddo
+		return
+	end
+
   subroutine hllc(priml,primr,F,cmax)
     use parameters
     use model

@@ -2,7 +2,7 @@ module parameters
   implicit none
   integer, parameter       :: NX        = 1
   integer, parameter       :: NY        = 1000
-  integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 3
+  integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 5
   integer, parameter       :: DP        = kind(1.0d0)
   integer, parameter       :: ITFINAL   = 100000000
   real(kind=dp), parameter :: TIMEFINAL = 120.0d0
