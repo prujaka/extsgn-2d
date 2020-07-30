@@ -7,17 +7,17 @@ set xlabel "x, m"
 
 set multiplot layout 3,2
   set ylabel "h, m"#; set yrange[0.9:1.9]
-  plot "res.out" u 2:3 title 'h'
+  plot "res.out" u 1:3 title 'h'
 
   set ylabel "u, m/s"#; set yrange[-1:1]
-  plot "res.out" u 2:4 title 'u'
+  plot "res.out" u 1:4 title 'u'
 
   set ylabel "v, m/s"
-  plot "res.out" u 2:5 title 'v'
+  plot "res.out" u 1:5 title 'v'
 
   set ylabel "eta, m"#; set yrange[0.9:1.9]
-  plot "res.out" u 2:6 title 'eta'
+  plot "res.out" u 1:6 title 'eta'
 
   set ylabel "w, m/s"#; set yrange[-1:1]
-  plot "res.out" u 2:7 title 'w'
+  plot "res.out" u 1:7 title 'w'
 unset multiplot

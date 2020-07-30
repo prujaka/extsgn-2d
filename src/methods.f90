@@ -170,9 +170,12 @@ module methods
     real(kind=DP) :: cmax1, cmax2
 
     call set_bc(prim)
-    call riemann_fluxes_x(prim,Fflux,cmax1)
-    call riemann_fluxes_y(prim,Gflux,cmax2)
-    cmax = dmax1(cmax1,cmax2)
+    ! call riemann_fluxes_x(prim,Fflux,cmax1)
+    ! call riemann_fluxes_y(prim,Gflux,cmax2)
+    call muscl_step_x(prim,Fflux,cmax1)
+    Gflux = 0.0d0
+    cmax = cmax1
+    ! cmax = dmax1(cmax1,cmax2)
     dt=CFL*DL/cmax
     call godunov(cons,Fflux,Gflux)
     call get_prims_gn(prim,h,u,v,eta,w)
@@ -288,6 +291,7 @@ module methods
 
   subroutine muscl_step_x(prim,F,cmax)
 		use parameters
+    use aux
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
@@ -307,8 +311,6 @@ module methods
 		real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
     real(kind=DP) :: slope(NEQS,0:NX+1,0:NY+1)
 
-    real(kind=DP) :: slope(0:N+1,NEQS)
-
     call get_slopes_x(prim,slope)
     primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
     priml(:,:,:) = prim(:,:,:) + 0.5d0*slope(:,:,:)
@@ -320,13 +322,14 @@ module methods
 		implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
+    integer :: i
 
     do i=1,NX
       slope(:,i,:) = 0.5d0*(1.0d0+OMEGA)*(prim(:,i,:) - prim(:,i-1,:))&
                    + 0.5d0*(1.0d0-OMEGA)*(prim(:,i+1,:) - prim(:,i,:))
     enddo
 		return
-	subroutine get_slopes_x
+	end subroutine get_slopes_x
 
 	subroutine set_bc_muscl_x(primr,priml)
 		use parameters
@@ -347,7 +350,6 @@ module methods
 
 	subroutine riemann_fluxes_muscl_x(primr,priml,flux,cmax)
 		use parameters
-		use solvers
 		implicit none
 		real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
 		real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
