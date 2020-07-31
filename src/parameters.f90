@@ -37,7 +37,11 @@ module parameters
 
   integer, parameter     :: IC_RP_X     = 0
   integer, parameter     :: IC_RP_Y     = 1
+  integer, parameter     :: METHOD_GODUNOV = 0
+  integer, parameter     :: METHOD_IMEX = 1
+
   integer, parameter     :: SELECTOR_IC = IC_RP_X
+  integer, parameter     :: SELECTOR_METHOD = METHOD_IMEX
 
   real(kind=DP), parameter :: BC_U_LEFT = -1.0d0
   real(kind=DP), parameter :: BC_U_RIGHT= -1.0d0

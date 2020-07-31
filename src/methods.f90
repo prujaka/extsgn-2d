@@ -138,6 +138,26 @@ module methods
     return
   end subroutine cons_to_prim
 
+  subroutine get_solution(prim,cons,it,time,cmax)
+    use parameters
+    use model
+    implicit none
+    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    integer, intent(inout) :: it
+    real(kind=DP), intent(inout) :: time
+    real(kind=DP), intent(out) :: cmax
+
+    select case(SELECTOR_METHOD)
+      case(METHOD_GODUNOV)
+        call get_solution_godunov(prim,cons,it,time,cmax)
+      case(METHOD_IMEX)
+        call get_solution_imex(prim,cons,it,time,cmax)
+    end select
+
+    return
+  end subroutine get_solution
+
   subroutine get_solution_godunov(prim,cons,it,time,cmax)
     use parameters
     use model
@@ -158,6 +178,26 @@ module methods
     return
   end subroutine get_solution_godunov
 
+  subroutine get_solution_imex(prim,cons,it,time,cmax)
+    use parameters
+    use model
+    implicit none
+    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    integer, intent(inout) :: it
+    real(kind=DP), intent(inout) :: time
+    real(kind=DP), intent(out) :: cmax
+
+    do while(time<TIMEFINAL)
+  		if (it.ge.ITFINAL) exit
+      call timestep_secondorder(prim,cons,cmax)
+  		it=it+1
+  		time=time+dt
+  	enddo
+
+    return
+  end subroutine get_solution_imex
+
   subroutine timestep_firstorder(prim,cons,cmax)
     use parameters
     use model
@@ -170,12 +210,9 @@ module methods
     real(kind=DP) :: cmax1, cmax2
 
     call set_bc(prim)
-    ! call riemann_fluxes_x(prim,Fflux,cmax1)
-    ! call riemann_fluxes_y(prim,Gflux,cmax2)
-    call muscl_step_x(prim,Fflux,cmax1)
-    Gflux = 0.0d0
-    cmax = cmax1
-    ! cmax = dmax1(cmax1,cmax2)
+    call riemann_fluxes_x(prim,Fflux,cmax1)
+    call riemann_fluxes_y(prim,Gflux,cmax2)
+    cmax = dmax1(cmax1,cmax2)
     dt=CFL*DL/cmax
     call godunov(cons,Fflux,Gflux)
     call get_prims_gn(prim,h,u,v,eta,w)
@@ -186,6 +223,32 @@ module methods
 
     return
   end subroutine timestep_firstorder
+
+  subroutine timestep_secondorder(prim,cons,cmax)
+    use parameters
+    use model
+    implicit none
+    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: cmax
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: Fflux,Gflux,S
+    real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
+    real(kind=DP) :: cmax1, cmax2
+
+    call set_bc(prim)
+    call muscl_step_x(prim,Fflux,cmax1)
+    call muscl_step_y(prim,Gflux,cmax2)
+    cmax = dmax1(cmax1,cmax2)
+    dt=CFL*DL/cmax
+    call godunov(cons,Fflux,Gflux)
+    call get_prims_gn(prim,h,u,v,eta,w)
+    call ode_exact_solution(h,u,v,eta,w)
+    call make_sources(h,eta,w,S)
+    call ode_euler_step(S,cons)
+    call cons_to_prim(cons,prim)
+
+    return
+  end subroutine timestep_secondorder
 
   subroutine set_bc(prim)
     use parameters
@@ -367,6 +430,105 @@ module methods
     enddo
 		return
 	end subroutine riemann_fluxes_muscl_x
+
+  subroutine muscl_step_y(prim,F,cmax)
+		use parameters
+    use aux
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: cmax
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
+
+    call data_reconstruction_y(prim,primr,priml)
+    call set_bc_muscl_y(primr,priml)
+    call riemann_fluxes_muscl_y(primr,priml,F,cmax)
+
+		return
+	end subroutine muscl_step_y
+
+	subroutine data_reconstruction_y(prim,primr,priml)
+		use parameters
+		implicit none
+		real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+		real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
+    real(kind=DP) :: slope(NEQS,0:NX+1,0:NY+1)
+
+    call get_slopes_y(prim,slope)
+    primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
+    priml(:,:,:) = prim(:,:,:) + 0.5d0*slope(:,:,:)
+    return
+	end subroutine data_reconstruction_y
+
+	subroutine get_slopes_y(prim,slope)
+		use parameters
+		implicit none
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
+    integer :: j
+
+    do j=1,NY
+      slope(:,:,j) = 0.5d0*(1.0d0+OMEGA)*(prim(:,:,j) - prim(:,:,j-1))&
+                   + 0.5d0*(1.0d0-OMEGA)*(prim(:,:,j+1) - prim(:,:,j))
+    enddo
+		return
+	end subroutine get_slopes_y
+
+	subroutine set_bc_muscl_y(primr,priml)
+		use parameters
+		implicit none
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
+    integer :: i
+
+    do i=1,NX
+      priml(:,i,0) = primr(:,i,1)
+      priml(3,i,0) = BC_V_LEFT*primr(3,i,1)
+
+      primr(:,i,NY+1) = priml(:,i,NY)
+      primr(3,i,NY+1) = BC_V_RIGHT*priml(3,i,NY)
+    enddo
+
+		return
+	end subroutine set_bc_muscl_y
+
+	subroutine riemann_fluxes_muscl_y(primr,priml,flux,cmax)
+		use parameters
+		implicit none
+		real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
+		real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
+    real(kind=DP), dimension(NEQS) :: statel, stater, F
+    integer :: i,j
+
+    cmax = 0.0d0
+    do j=1,NY
+      do i=0,Nx
+        statel = priml(:,i,j)
+        stater = primr(:,i+1,j)
+        call hllc(statel,stater,F,cmax)
+        flux(:,i,j) = F
+      enddo
+    enddo
+    do i=1,NX
+      do j=0,NY
+        statel = priml(:,i,j)
+        statel(2) = priml(3,i,j)
+        statel(3) = priml(2,i,j)
+
+        stater = primr(:,i,j+1)
+        stater(2) = primr(3,i,j+1)
+        stater(3) = primr(2,i,j+1)
+
+        call hllc(statel,stater,F,cmax)
+
+        flux(:,i,j) = F
+        flux(2,i,j) = F(3)
+        flux(3,i,j) = F(2)
+      enddo
+    enddo
+
+		return
+	end subroutine riemann_fluxes_muscl_y
+
+
 
   subroutine hllc(priml,primr,F,cmax)
     use parameters

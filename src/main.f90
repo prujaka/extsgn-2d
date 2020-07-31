@@ -16,7 +16,7 @@ program extsgn_imex2d
   call cpu_time(t1)
 
   call initialize_problem(x,y,prim,cons,it,time)
-  call get_solution_godunov(prim,cons,it,time,cmax)
+  call get_solution(prim,cons,it,time,cmax)
   call output_solution(OUTPUT_FILE,x,y,prim,time)
 
   call cpu_time(t2)
