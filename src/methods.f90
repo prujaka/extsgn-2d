@@ -528,7 +528,94 @@ module methods
 		return
 	end subroutine riemann_fluxes_muscl_y
 
+  subroutine imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
+    use parameters
+    use solvers
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F, G
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(out) :: hstar,ustar,vstar,&
+                                                            etastar,wstar
+    real(kind=DP) :: alpha, C4, C5
+    integer :: i,j
 
+    do i=1,NX
+      do j=1,NY
+        hstar(i,j) = h(i,j) - DELTA*(dy*(F(1,i,j)-F(1,i-1,j))&
+                                     +dx*(G(1,i,j)-G(1,i,j-1)))*dt/dV
+        ustar(i,j) = ( h(i,j)*u(i,j) - DELTA*(dy*(F(2,i,j)-F(2,i-1,j))&
+                         +dx*(G(2,i,j)-G(2,i,j-1)))*dt/dV )/hstar(i,j)
+        vstar(i,j) = ( h(i,j)*v(i,j) - DELTA*(dy*(F(3,i,j)-F(3,i-1,j))&
+                         +dx*(G(3,i,j)-G(3,i,j-1)))*dt/dV )/hstar(i,j)
+        C4 = ( h(i,j)*eta(i,j) - DELTA*(dy*(F(4,i,j)-F(4,i-1,j))&
+                         +dx*(G(4,i,j)-G(4,i,j-1)))*dt/dV )/hstar(i,j)
+        C5 = ( h(i,j)*w(i,j) - DELTA*(dy*(F(5,i,j)-F(5,i-1,j))&
+                         +dx*(G(5,i,j)-G(5,i,j-1)))*dt/dV )/hstar(i,j)
+        alpha = 1.0d0/(1.0d0 +LAMBDA*DELTA*DELTA*dt*dt/(hstar(i,j)*hstar(i,j)))
+
+        etastar(i,j) = alpha*( C4 + DELTA*dt*C5&
+                      + DELTA*DELTA*dt*dt*LAMBDA/hstar(i,j) )
+
+        wstar(i,j) = alpha*( C5 - C4*DELTA*dt*LAMBDA/(hstar(i,j)*hstar(i,j))&
+                           + DELTA*dt*LAMBDA/hstar(i,j) )
+      enddo
+    enddo
+    return
+  end subroutine imex_step_1
+
+  subroutine imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
+    use parameters
+    use solvers
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1),intent(in):: F,G,Fstar,Gstar,S
+    real(kind=DP) :: alpha, C4, C5, hnew
+    integer :: i,j
+
+    do i=1,NX
+      do j=1,NY
+        hnew = h(i,j) - (DELTA-1.0d0)*(dy*(F(1,i,j)-F(1,i-1,j))&
+                        + dx*(G(1,i,j)-G(1,i,j-1)))*dt/dV &
+                      - (2.0d0 - DELTA)*(dy*(Fstar(1,i,j)-Fstar(1,i-1,j))&
+                        + dx*(Gstar(1,i,j)-Gstar(1,i,j-1)))*dt/dV
+
+        u(i,j) = ( h(i,j)*u(i,j)&
+                  - (DELTA-1.0d0)*(dy*(F(2,i,j)-F(2,i-1,j))&
+                    + dx*(G(2,i,j)-G(2,i,j-1)))*dt/dV &
+                  - (2.0d0 - DELTA)*(dy*(Fstar(2,i,j)-Fstar(2,i-1,j))&
+                    + dx*(Gstar(2,i,j)-Gstar(2,i,j-1)))*dt/dV )/hnew
+
+        v(i,j) = ( h(i,j)*v(i,j)&
+                  - (DELTA-1.0d0)*(dy*(F(3,i,j)-F(3,i-1,j))&
+                    + dx*(G(3,i,j)-G(3,i,j-1)))*dt/dV &
+                  - (2.0d0 - DELTA)*(dy*(Fstar(3,i,j)-Fstar(3,i-1,j))&
+                    + dx*(Gstar(3,i,j)-Gstar(3,i,j-1)))*dt/dV )/hnew
+
+        C4 = ( h(i,j)*eta(i,j)&
+                - (DELTA-1.0d0)*(dy*(F(4,i,j)-F(4,i-1,j))&
+                  + dx*(G(4,i,j)-G(4,i,j-1)))*dt/dV &
+                - (2.0d0 - DELTA)*(dy*(Fstar(4,i,j)-Fstar(4,i-1,j))&
+                  + dx*(Gstar(4,i,j)-Gstar(4,i,j-1)))*dt/dV&
+                            + (1.0d0 - DELTA)*dt*S(4,i,j) )/hnew
+
+        C5 = ( h(i,j)*w(i,j)&
+                - (DELTA-1.0d0)*(dy*(F(5,i,j)-F(5,i-1,j))&
+                  + dx*(G(5,i,j)-G(5,i,j-1)))*dt/dV &
+                - (2.0d0 - DELTA)*(dy*(Fstar(5,i,j)-Fstar(5,i-1,j))&
+                  + dx*(Gstar(5,i,j)-Gstar(5,i,j-1)))*dt/dV&
+                            + (1.0d0 - DELTA)*dt*S(5,i,j) )/hnew
+
+        alpha = 1.0d0/( 1.0d0 + DELTA*DELTA*dt*dt*LAMBDA/(hnew*hnew) )
+
+        eta(i,j) = alpha*( C4 + DELTA*dt*C5 + DELTA*DELTA*dt*dt*LAMBDA/hnew )
+
+        w(i,j) = alpha*( C5 - C4*DELTA*dt*LAMBDA/(hnew*hnew)&
+                           + DELTA*dt*LAMBDA/hnew )
+        h(i,j) = hnew
+      enddo
+    enddo
+    return
+  end subroutine imex_step_2
 
   subroutine hllc(priml,primr,F,cmax)
     use parameters
