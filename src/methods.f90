@@ -148,11 +148,13 @@ module methods
     real(kind=DP), intent(inout) :: time
     real(kind=DP), intent(out) :: cmax
 
+    print*, ''
+    print*, 'Calculation started.'
     select case(SELECTOR_METHOD)
       case(METHOD_GODUNOV)
         call get_solution_godunov(prim,cons,it,time,cmax)
       case(METHOD_IMEX)
-        call get_solution_imex(prim,cons,it,time,cmax)
+        call get_solution_imex(prim,it,time,cmax)
     end select
 
     return
@@ -167,10 +169,12 @@ module methods
     integer, intent(inout) :: it
     real(kind=DP), intent(inout) :: time
     real(kind=DP), intent(out) :: cmax
+    real(kind=DP) :: milestone=0.0d0, t1
 
     do while(time<TIMEFINAL)
   		if (it.ge.ITFINAL) exit
       call timestep_godunov(prim,cons,cmax)
+      call print_percentage(time,t1,milestone)
   		it=it+1
   		time=time+dt
   	enddo
@@ -204,19 +208,20 @@ module methods
     return
   end subroutine timestep_godunov
 
-  subroutine get_solution_imex(prim,cons,it,time,cmax)
+  subroutine get_solution_imex(prim,it,time,cmax)
     use parameters
     use model
     implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer, intent(inout) :: it
     real(kind=DP), intent(inout) :: time
     real(kind=DP), intent(out) :: cmax
+    real(kind=DP) :: milestone=0.0d0, t1
 
     do while(time<TIMEFINAL)
   		if (it.ge.ITFINAL) exit
-      call timestep_imex(prim,cons,cmax)
+      call timestep_imex(prim,cmax)
+      call print_percentage(time,t1,milestone)
   		it=it+1
   		time=time+dt
   	enddo
@@ -224,11 +229,10 @@ module methods
     return
   end subroutine get_solution_imex
 
-  subroutine timestep_imex(prim,cons,cmax)
+  subroutine timestep_imex(prim,cmax)
     use parameters
     use model
     implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: F,G,Fstar,Gstar,S
