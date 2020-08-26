@@ -1,5 +1,6 @@
-set terminal postscript eps size 14cm, 14cm
+set terminal postscript eps enhanced color size 14cm, 14cm
 set output "huvetaw2d.eps"
+set pointsize 0.2
 
 set xlabel "x, m"
 set ylabel "y, m"

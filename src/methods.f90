@@ -49,6 +49,8 @@ module methods
         call set_ic_rp_x(x,prim)
   		case(IC_RP_Y)
   	    call set_ic_rp_y(y,prim)
+      case(IC_RP_CYL)
+        call set_ic_rp_cyl(x,y,prim)
 		end select
     return
   end subroutine set_ic
@@ -107,6 +109,33 @@ module methods
 
     return
   end subroutine set_ic_rp_y
+  subroutine set_ic_rp_cyl(x,y,prim)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NX+1)
+    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    integer :: i, j
+
+    do j=1, NY
+      do i=1, NX
+        if (x(i)*x(i)+y(j)*y(j).le.RADIUS*RADIUS) then
+          prim(1,i,j) = HL_INIT
+          prim(2,i,j) = UL_INIT
+          prim(3,i,j) = VL_INIT
+          prim(4,i,j) = ETAL_INIT
+          prim(5,i,j) = WL_INIT
+        else
+          prim(1,i,j) = HR_INIT
+          prim(2,i,j) = UR_INIT
+          prim(3,i,j) = VR_INIT
+          prim(4,i,j) = ETAR_INIT
+          prim(5,i,j) = WR_INIT
+        endif
+      enddo
+    enddo
+
+    return
+  end subroutine set_ic_rp_cyl
 
   subroutine prim_to_cons(prim,cons)
     use parameters

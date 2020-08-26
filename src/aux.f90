@@ -32,9 +32,9 @@ contains
     integer :: i,k,j
 
     open(unit=10,file=filename)
-    do j=1, NY
-      do i=1, NX
-        write(10,*) x(i), y(j), (prim(k,i,j), k=1,NEQS), time
+    do i=1, NX
+      do j=1, NY
+        write(10,FMT=DATA_FORMAT) x(i), y(j), (prim(k,i,j), k=1,NEQS), time
       enddo
     enddo
     close(10)
