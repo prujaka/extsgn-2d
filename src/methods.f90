@@ -170,13 +170,39 @@ module methods
 
     do while(time<TIMEFINAL)
   		if (it.ge.ITFINAL) exit
-      call timestep_firstorder(prim,cons,cmax)
+      call timestep_godunov(prim,cons,cmax)
   		it=it+1
   		time=time+dt
   	enddo
 
     return
   end subroutine get_solution_godunov
+
+  subroutine timestep_godunov(prim,cons,cmax)
+    use parameters
+    use model
+    implicit none
+    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), intent(out) :: cmax
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: F,G,S
+    real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
+    real(kind=DP) :: cmax1, cmax2
+
+    call set_bc(prim)
+    call riemann_fluxes_x(prim,F,cmax1)
+    call riemann_fluxes_y(prim,G,cmax2)
+    cmax = dmax1(cmax1,cmax2)
+    dt=CFL*DL/cmax
+    call godunov(cons,F,G)
+    call split_prims_gn(prim,h,u,v,eta,w)
+    call ode_exact_solution(h,u,v,eta,w)
+    call make_sources(h,eta,w,S)
+    call ode_euler_step(S,cons)
+    call cons_to_prim(cons,prim)
+
+    return
+  end subroutine timestep_godunov
 
   subroutine get_solution_imex(prim,cons,it,time,cmax)
     use parameters
@@ -190,7 +216,7 @@ module methods
 
     do while(time<TIMEFINAL)
   		if (it.ge.ITFINAL) exit
-      call timestep_secondorder(prim,cons,cmax)
+      call timestep_imex(prim,cons,cmax)
   		it=it+1
   		time=time+dt
   	enddo
@@ -198,57 +224,43 @@ module methods
     return
   end subroutine get_solution_imex
 
-  subroutine timestep_firstorder(prim,cons,cmax)
+  subroutine timestep_imex(prim,cons,cmax)
     use parameters
     use model
     implicit none
     real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: Fflux,Gflux,S
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: F,G,Fstar,Gstar,S
     real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
+    real(kind=DP), dimension(0:NX+1,0:NY+1) :: hstar,ustar,vstar,etastar,wstar
+    real(kind=DP) :: primstar(NEQS,0:NX+1,0:NY+1)
     real(kind=DP) :: cmax1, cmax2
 
     call set_bc(prim)
-    call riemann_fluxes_x(prim,Fflux,cmax1)
-    call riemann_fluxes_y(prim,Gflux,cmax2)
+    call muscl_step_x(prim,F,cmax1)
+    call muscl_step_y(prim,G,cmax2)
     cmax = dmax1(cmax1,cmax2)
     dt=CFL*DL/cmax
-    call godunov(cons,Fflux,Gflux)
-    call get_prims_gn(prim,h,u,v,eta,w)
-    call ode_exact_solution(h,u,v,eta,w)
-    call make_sources(h,eta,w,S)
-    call ode_euler_step(S,cons)
-    call cons_to_prim(cons,prim)
+    ! call godunov(cons,F,G)
+    ! call split_prims_gn(prim,h,u,v,eta,w)
+    ! call ode_exact_solution(h,u,v,eta,w)
+    ! call make_sources(h,eta,w,S)
+    ! call ode_euler_step(S,cons)
+    ! call cons_to_prim(cons,prim)
+
+    call split_prims_gn(prim,h,u,v,eta,w)
+    call imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
+    call make_sources(hstar,etastar,wstar,S)
+    call merge_prims_gn(hstar,ustar,vstar,etastar,wstar,primstar)
+    call set_bc(primstar)
+    call muscl_step_x(primstar,Fstar,cmax1)
+    call muscl_step_y(primstar,Gstar,cmax2)
+    call imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
+    call merge_prims_gn(h,u,v,eta,w,prim)
 
     return
-  end subroutine timestep_firstorder
-
-  subroutine timestep_secondorder(prim,cons,cmax)
-    use parameters
-    use model
-    implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: cmax
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: Fflux,Gflux,S
-    real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
-    real(kind=DP) :: cmax1, cmax2
-
-    call set_bc(prim)
-    call muscl_step_x(prim,Fflux,cmax1)
-    call muscl_step_y(prim,Gflux,cmax2)
-    cmax = dmax1(cmax1,cmax2)
-    dt=CFL*DL/cmax
-    call godunov(cons,Fflux,Gflux)
-    call get_prims_gn(prim,h,u,v,eta,w)
-    call ode_exact_solution(h,u,v,eta,w)
-    call make_sources(h,eta,w,S)
-    call ode_euler_step(S,cons)
-    call cons_to_prim(cons,prim)
-
-    return
-  end subroutine timestep_secondorder
+  end subroutine timestep_imex
 
   subroutine set_bc(prim)
     use parameters
@@ -325,18 +337,18 @@ module methods
     return
   end subroutine riemann_fluxes_y
 
-  subroutine godunov(cons,Fflux,Gflux)
+  subroutine godunov(cons,F,G)
     use parameters
     implicit none
 
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: Fflux,Gflux
+    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F,G
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: cons
     integer :: i,j
 
     do j=1,Ny
       do i=1,Nx
-        cons(:,i,j)=cons(:,i,j)-dt/dV*( dy*(Fflux(:,i,j)-Fflux(:,i-1,j))&
-                                       +dx*(Gflux(:,i,j)-Gflux(:,i,j-1)) )
+        cons(:,i,j)=cons(:,i,j)-dt/dV*( dy*(F(:,i,j)-F(:,i-1,j))&
+                                       +dx*(G(:,i,j)-G(:,i,j-1)) )
       enddo
     enddo
     return
@@ -530,7 +542,6 @@ module methods
 
   subroutine imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
     use parameters
-    use solvers
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F, G
@@ -565,7 +576,6 @@ module methods
 
   subroutine imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
     use parameters
-    use solvers
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1),intent(in):: F,G,Fstar,Gstar,S

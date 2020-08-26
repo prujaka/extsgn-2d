@@ -21,7 +21,7 @@ module model
 		return
 	end
 
-  subroutine get_prims_gn(prim,h,u,v,eta,w)
+  subroutine split_prims_gn(prim,h,u,v,eta,w)
     use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
@@ -33,7 +33,21 @@ module model
     eta(:,:) = prim(4,:,:)
     w(:,:) = prim(5,:,:)
 
-  end subroutine get_prims_gn
+  end subroutine split_prims_gn
+
+  subroutine merge_prims_gn(h,u,v,eta,w,prim)
+    use parameters
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
+    real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
+
+    prim(1,:,:) = h(:,:)
+    prim(2,:,:) = u(:,:)
+    prim(3,:,:) = v(:,:)
+    prim(4,:,:) = eta(:,:)
+    prim(5,:,:) = w(:,:)
+
+  end subroutine merge_prims_gn
 
   subroutine ode_exact_solution(h,u,v,eta,w)
 		use parameters
