@@ -1,7 +1,7 @@
 module parameters
   implicit none
-  integer, parameter       :: NX        = 1000
-  integer, parameter       :: NY        = 1000
+  integer, parameter       :: NX        = 2000
+  integer, parameter       :: NY        = 2000
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 5
   integer, parameter       :: DP        = kind(1.0d0)
   integer, parameter       :: ITFINAL   = 100000000
