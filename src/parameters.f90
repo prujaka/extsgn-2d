@@ -15,7 +15,7 @@ module parameters
   real(kind=DP), parameter :: YLEFT     = -300.0d0
   real(kind=DP), parameter :: YRIGHT    = 300.0d0
   real(kind=DP), parameter :: YMID      = 0.0d0
-  real(kind=dp), parameter :: GG        = 9.81d0
+  real(kind=dp), parameter :: GG        = 9.810d0
   real(kind=dp), parameter :: RADIUS    = 20.0d0
   real(kind=DP), parameter :: DX        = (XRIGHT-XLEFT) / DFLOAT(NX)
   real(kind=DP), parameter :: DY        = (YRIGHT-YLEFT) / DFLOAT(NY)
