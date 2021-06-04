@@ -1,4 +1,5 @@
 .DS_Store
 *.mod
 *.out
+*.eps
 exe
