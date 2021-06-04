@@ -3,25 +3,25 @@ use parameters
 implicit none
 contains
 
-	subroutine print_percentage(time,t1,milestone)
-		use parameters
-		implicit none
-		real(kind=DP), intent(in) :: time
-		real(kind=DP), intent(inout) :: t1
-		real(kind=DP) :: milestone
-		real(kind=DP) :: t2, percentage
+  subroutine print_percentage(time,t1,milestone)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: time
+    real(kind=DP), intent(inout) :: t1
+    real(kind=DP) :: milestone
+    real(kind=DP) :: t2, percentage
 
-		percentage = time*100.0d0/timefinal
-		if (percentage > milestone) then
-			call cpu_time(t2)
-			write(*,'(I4,A,(F8.1),A)') NINT(percentage), &
-																' % completed ', t2-t1, ' sec'
-			milestone = milestone + PERC_FREQ
-			call cpu_time(t1)
-		endif
+    percentage = time*100.0d0/timefinal
+    if (percentage > milestone) then
+      call cpu_time(t2)
+      write(*,'(I4,A,(F8.1),A)') NINT(percentage), ' % completed ', t2-t1, &
+        ' sec'
+      milestone = milestone + PERC_FREQ
+      call cpu_time(t1)
+    endif
 
-		return
-	end
+    return
+  end
 
   subroutine output_solution(filename,x,y,prim,time)
     use parameters

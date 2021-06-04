@@ -1,12 +1,12 @@
 module parameters
   implicit none
-  integer, parameter       :: NX        = 2000
-  integer, parameter       :: NY        = 2000
+  integer, parameter       :: NX        = 8000
+  integer, parameter       :: NY        = 8000
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 5
   integer, parameter       :: DP        = kind(1.0d0)
-  integer, parameter       :: ITFINAL   = 100000000
+  integer, parameter       :: ITFINAL   = 1000
   real(kind=dp), parameter :: TIMEFINAL = 40.0d0
-  real(kind=dp), parameter :: CFL       = 0.5d0
+  real(kind=dp), parameter :: CFL       = 0.4d0
   real(kind=dp), parameter :: LAMBDA    = 50.0d0
   real(kind=DP), parameter :: DELTA     = 0.2928932188134524d0
   real(kind=DP), parameter :: XLEFT     = -300.0d0
@@ -46,7 +46,7 @@ module parameters
   integer, parameter     :: METHOD_IMEX = 1
 
   integer, parameter     :: SELECTOR_IC = IC_RP_CYL
-  integer, parameter     :: SELECTOR_METHOD = METHOD_IMEX
+  integer, parameter     :: SELECTOR_METHOD = METHOD_GODUNOV
 
   real(kind=DP), parameter :: BC_U_LEFT = -1.0d0
   real(kind=DP), parameter :: BC_U_RIGHT= -1.0d0

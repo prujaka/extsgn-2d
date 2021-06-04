@@ -8,7 +8,7 @@ file4=methods.f90
 main=main.f90
 exefile=exe
 
-gfortran -O3 -o $exefile $file1 $file2 $file3 $file4 $main
+gfortran -C -g -Wall -o $exefile $file1 $file2 $file3 $file4 $main
 rm *.mod*
 mv $exefile ../$exefile
 cd ..

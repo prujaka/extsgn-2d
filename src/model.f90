@@ -4,22 +4,22 @@ module model
   contains
 
   real(8) function get_p(h, eta)
-		use parameters
-		implicit none
-		real(kind=DP), intent(in) :: h, eta
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: h, eta
 
-		get_p = 0.5d0*gg*h*h - LAMBDA*eta*(eta/h-1.0d0)/3.0d0
-		return
-	end
+    get_p = 0.5d0*gg*h*h - LAMBDA*eta*(eta/h-1.0d0)/3.0d0
+    return
+  end
 
-	real(8) function get_a(h, eta)
-		use parameters
-		implicit none
-		real(kind=DP), intent(in) :: h, eta
+  real(8) function get_a(h, eta)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: h, eta
 
-		get_a = DSQRT(gg*h + LAMBDA*eta*eta/(h*h)/3.0d0)
-		return
-	end
+    get_a = DSQRT(gg*h + LAMBDA*eta*eta/(h*h)/3.0d0)
+    return
+  end
 
   subroutine split_prims_gn(prim,h,u,v,eta,w)
     use parameters
@@ -50,13 +50,14 @@ module model
   end subroutine merge_prims_gn
 
   subroutine ode_exact_solution(h,u,v,eta,w)
-		use parameters
-		implicit none
-		real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
-		real(kind=DP), dimension(0:NX+1,0:NY+1):: etanew
+    use parameters
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
+    real(kind=DP), dimension(0:NX+1,0:NY+1) :: etanew
 
     h(:,:) = h(:,:)
     u(:,:) = u(:,:)
+    v(:,:) = v(:,:)
     etanew(:,:) = (eta(:,:)-h(:,:))*dcos( dsqrt(LAMBDA)*dt/h(:,:) )&
                + w(:,:)*h(:,:)*dsin( dsqrt(LAMBDA)*dt/h(:,:) )/dsqrt(LAMBDA)&
                + h(:,:)
@@ -64,23 +65,22 @@ module model
                 *dsin( dsqrt(LAMBDA)*dt/h(:,:) )&
                 /h(:,:) + w(:,:)*dcos( dsqrt(LAMBDA)*dt/h(:,:) )
     eta(:,:) = etanew(:,:)
-		return
-	end subroutine ode_exact_solution
+    return
+  end subroutine ode_exact_solution
 
   subroutine make_sources(h,eta,w,S)
-			use parameters
-			implicit none
-			real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,eta,w
-			real(kind=DP), intent(out) :: S(NEQS,0:NX+1,0:NY+1)
-			integer :: i
+      use parameters
+      implicit none
+      real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,eta,w
+      real(kind=DP), intent(out) :: S(NEQS,0:NX+1,0:NY+1)
 
-			S(1,:,:) = 0.0d0
-			S(2,:,:) = 0.0d0
-			S(3,:,:) = 0.0d0
-			S(4,:,:) = h(:,:)*w(:,:)
-			S(5,:,:) = LAMBDA*(1.0d0 - eta(:,:)/h(:,:))
+      S(1,:,:) = 0.0d0
+      S(2,:,:) = 0.0d0
+      S(3,:,:) = 0.0d0
+      S(4,:,:) = h(:,:)*w(:,:)
+      S(5,:,:) = LAMBDA*(1.0d0 - eta(:,:)/h(:,:))
 
-			return
-		end subroutine make_sources
+      return
+    end subroutine make_sources
 
 end module model
