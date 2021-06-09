@@ -1,7 +1,7 @@
 module parameters
   implicit none
-  integer, parameter       :: NX        = 8000
-  integer, parameter       :: NY        = 8000
+  integer, parameter       :: NX        = 100
+  integer, parameter       :: NY        = 100
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 5
   integer, parameter       :: DP        = kind(1.0d0)
   integer, parameter       :: ITFINAL   = 1000
@@ -46,7 +46,7 @@ module parameters
   integer, parameter     :: METHOD_IMEX = 1
 
   integer, parameter     :: SELECTOR_IC = IC_RP_CYL
-  integer, parameter     :: SELECTOR_METHOD = METHOD_GODUNOV
+  integer, parameter     :: SELECTOR_METHOD = METHOD_IMEX
 
   real(kind=DP), parameter :: BC_U_LEFT = -1.0d0
   real(kind=DP), parameter :: BC_U_RIGHT= -1.0d0

@@ -8,7 +8,9 @@ file4=methods.f90
 main=main.f90
 exefile=exe
 
-gfortran -funderscoring -C -g -Wall -o $exefile $file1 $file2 $file3 $file4 $main
+
+#mpif90 -g -Wall -pedantic -Wextra -fcheck=all -fbacktrace -o $exefile $file1 $file2 $file3 $file4 $main
+mpif90 -o $exefile $file1 $file2 $file3 $file4 $main
 rm *.mod*
 mv $exefile ../$exefile
 cd ..

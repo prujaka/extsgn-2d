@@ -112,7 +112,7 @@ module methods
   subroutine set_ic_rp_cyl(x,y,prim)
     use parameters
     implicit none
-    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NX+1)
+    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
     integer :: i, j
 
@@ -272,11 +272,20 @@ module methods
     implicit none
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: F,G,Fstar,Gstar,S
-    real(kind=DP), dimension(0:NX+1,0:NY+1) :: h,u,v,eta,w
-    real(kind=DP), dimension(0:NX+1,0:NY+1) :: hstar,ustar,vstar,etastar,wstar
-    real(kind=DP) :: primstar(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), allocatable :: F(:,:,:),G(:,:,:),Fstar(:,:,:),Gstar(:,:,:),S(:,:,:)
+    real(kind=DP), allocatable :: h(:,:),u(:,:),v(:,:),eta(:,:),w(:,:)
+    real(kind=DP), allocatable :: hstar(:,:),ustar(:,:),vstar(:,:),etastar(:,:),wstar(:,:)
+    real(kind=DP), allocatable :: primstar(:,:,:)
     real(kind=DP) :: cmax1, cmax2
+
+    allocate(F(NEQS,0:NX+1,0:NY+1),G(NEQS,0:NX+1,0:NY+1),Fstar(NEQS,0:NX+1,0:NY+1))
+    allocate(Gstar(NEQS,0:NX+1,0:NY+1),S(NEQS,0:NX+1,0:NY+1))
+    allocate(h(0:NX+1,0:NY+1),u(0:NX+1,0:NY+1),v(0:NX+1,0:NY+1),eta(0:NX+1,0:NY+1))
+    allocate(w(0:NX+1,0:NY+1))
+
+    allocate(hstar(0:NX+1,0:NY+1),ustar(0:NX+1,0:NY+1),vstar(0:NX+1,0:NY+1))
+    allocate(etastar(0:NX+1,0:NY+1),wstar(0:NX+1,0:NY+1))
+    allocate(primstar(NEQS,0:NX+1,0:NY+1))
 
     call set_bc(prim)
     call muscl_step_x(prim,F,cmax1)
@@ -299,6 +308,15 @@ module methods
     call muscl_step_y(primstar,Gstar,cmax2)
     call imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
     call merge_prims_gn(h,u,v,eta,w,prim)
+
+    deallocate(F,G,Fstar)
+    deallocate(Gstar,S)
+    deallocate(h,u,v,eta)
+    deallocate(w)
+
+    deallocate(hstar,ustar,vstar)
+    deallocate(etastar,wstar)
+    deallocate(primstar)
 
     return
   end subroutine timestep_imex
@@ -394,6 +412,68 @@ module methods
     enddo
     return
   end subroutine godunov
+
+  subroutine split_prims_gn(prim,h,u,v,eta,w)
+    use parameters
+    implicit none
+    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(out) :: h,u,v,eta,w
+
+    h(:,:) = prim(1,:,:)
+    u(:,:) = prim(2,:,:)
+    v(:,:) = prim(3,:,:)
+    eta(:,:) = prim(4,:,:)
+    w(:,:) = prim(5,:,:)
+
+  end subroutine split_prims_gn
+
+  subroutine merge_prims_gn(h,u,v,eta,w,prim)
+    use parameters
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
+    real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
+
+    prim(1,:,:) = h(:,:)
+    prim(2,:,:) = u(:,:)
+    prim(3,:,:) = v(:,:)
+    prim(4,:,:) = eta(:,:)
+    prim(5,:,:) = w(:,:)
+
+  end subroutine merge_prims_gn
+
+  subroutine ode_exact_solution(h,u,v,eta,w)
+    use parameters
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
+    real(kind=DP) :: etanew(0:NX+1,0:NY+1)
+
+    h(:,:) = h(:,:)
+    u(:,:) = u(:,:)
+    v(:,:) = v(:,:)
+    etanew(:,:) = (eta(:,:)-h(:,:))*dcos( dsqrt(LAMBDA)*dt/h(:,:) )&
+               + w(:,:)*h(:,:)*dsin( dsqrt(LAMBDA)*dt/h(:,:) )/dsqrt(LAMBDA)&
+               + h(:,:)
+    w(:,:) = -dsqrt(LAMBDA)*(etanew(:,:)-h(:,:))&
+                *dsin( dsqrt(LAMBDA)*dt/h(:,:) )&
+                /h(:,:) + w(:,:)*dcos( dsqrt(LAMBDA)*dt/h(:,:) )
+    eta(:,:) = etanew(:,:)
+    return
+  end subroutine ode_exact_solution
+
+  subroutine make_sources(h,eta,w,S)
+    use parameters
+    implicit none
+    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,eta,w
+    real(kind=DP), intent(out) :: S(NEQS,0:NX+1,0:NY+1)
+
+    S(1,:,:) = 0.0d0
+    S(2,:,:) = 0.0d0
+    S(3,:,:) = 0.0d0
+    S(4,:,:) = h(:,:)*w(:,:)
+    S(5,:,:) = LAMBDA*(1.0d0 - eta(:,:)/h(:,:))
+
+    return
+  end subroutine make_sources
 
   subroutine ode_euler_step(S,cons)
     use parameters
