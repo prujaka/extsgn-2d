@@ -1,13 +1,13 @@
 module parameters
   implicit none
-  integer, parameter       :: NX        = 100
-  integer, parameter       :: NY        = 100
+  integer, parameter       :: NX        = 200
+  integer, parameter       :: NY        = 200
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 5
   integer, parameter       :: DP        = kind(1.0d0)
-  integer, parameter       :: ITFINAL   = 1000
-  real(kind=dp), parameter :: TIMEFINAL = 40.0d0
+  integer, parameter       :: ITFIN     = 1000
+  real(kind=dp), parameter :: TFIN      = 40.0d0
   real(kind=dp), parameter :: CFL       = 0.4d0
-  real(kind=dp), parameter :: LAMBDA    = 50.0d0
+  real(kind=dp), parameter :: LAMBDA    = 1.0d-5
   real(kind=DP), parameter :: DELTA     = 0.2928932188134524d0
   real(kind=DP), parameter :: XLEFT     = -300.0d0
   real(kind=DP), parameter :: XRIGHT    = 300.0d0

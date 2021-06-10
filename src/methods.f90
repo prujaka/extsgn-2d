@@ -6,7 +6,6 @@ module methods
   contains
 
   subroutine initialize_problem(x,y,prim,cons,it,time)
-    use parameters
     implicit none
     real(kind=DP), intent(out) :: x(0:NX+1), y(0:NY+1), time
     real(kind=DP), dimension(NEQS, 0:NX+1, 0:NY+1),intent(out) :: prim, cons
@@ -22,7 +21,6 @@ module methods
   end subroutine initialize_problem
 
   subroutine set_mesh(x,y)
-    use parameters
     implicit none
     real(kind=DP), intent(out) :: x(0:NX+1)
     real(kind=DP), intent(out) :: y(0:NY+1)
@@ -39,7 +37,6 @@ module methods
   end subroutine set_mesh
 
   subroutine set_ic(x,y,prim)
-    use parameters
     implicit none
     real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
@@ -56,7 +53,6 @@ module methods
   end subroutine set_ic
 
   subroutine set_ic_rp_x(x,prim)
-    use parameters
     implicit none
     real(kind=DP), intent(in)  :: x(0:NX+1)
     real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
@@ -83,7 +79,6 @@ module methods
     return
   end subroutine set_ic_rp_x
   subroutine set_ic_rp_y(y,prim)
-    use parameters
     implicit none
     real(kind=DP), intent(in)  :: y(0:NY+1)
     real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
@@ -110,7 +105,6 @@ module methods
     return
   end subroutine set_ic_rp_y
   subroutine set_ic_rp_cyl(x,y,prim)
-    use parameters
     implicit none
     real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
@@ -138,7 +132,6 @@ module methods
   end subroutine set_ic_rp_cyl
 
   subroutine prim_to_cons(prim,cons)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cons(NEQS,0:NX+1,0:NY+1)
@@ -153,7 +146,6 @@ module methods
   end subroutine prim_to_cons
 
   subroutine cons_to_prim(cons,prim)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
@@ -168,30 +160,6 @@ module methods
   end subroutine cons_to_prim
 
   subroutine get_solution(prim,cons,it,time,cmax)
-    use parameters
-    use model
-    implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    integer, intent(inout) :: it
-    real(kind=DP), intent(inout) :: time
-    real(kind=DP), intent(out) :: cmax
-
-    print*, ''
-    print*, 'Calculation started.'
-    select case(SELECTOR_METHOD)
-      case(METHOD_GODUNOV)
-        call get_solution_godunov(prim,cons,it,time,cmax)
-      case(METHOD_IMEX)
-        call get_solution_imex(prim,it,time,cmax)
-    end select
-
-    return
-  end subroutine get_solution
-
-  subroutine get_solution_godunov(prim,cons,it,time,cmax)
-    use parameters
-    use model
     implicit none
     real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
@@ -200,20 +168,31 @@ module methods
     real(kind=DP), intent(out) :: cmax
     real(kind=DP) :: milestone=0.0d0, t1
 
-    do while(time<TIMEFINAL)
-      if (it.ge.ITFINAL) exit
-      call timestep_godunov(prim,cons,cmax)
+    print*, ''
+    print*, 'Calculation started.'
+
+    do while(time<TFIN)
+      if (it.ge.ITFIN) exit
+      dt = compute_dt(prim(1,:,:),prim(2,:,:),prim(3,:,:),prim(4,:,:))
+      if (dt>TFIN-time) dt = TFIN-time
+
+      select case(SELECTOR_METHOD)
+        case(METHOD_GODUNOV)
+          call timestep_godunov(prim,cons,cmax)
+        case(METHOD_IMEX)
+          call timestep_imex(prim,cmax)
+      end select
+
       call print_percentage(time,t1,milestone)
+
       it=it+1
       time=time+dt
     enddo
 
     return
-  end subroutine get_solution_godunov
+  end subroutine get_solution
 
   subroutine timestep_godunov(prim,cons,cmax)
-    use parameters
-    use model
     implicit none
     real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
@@ -223,10 +202,9 @@ module methods
     real(kind=DP), allocatable :: h(:,:), u(:,:), v(:,:), eta(:,:), w(:,:)
     real(kind=DP) :: cmax1, cmax2
 
-    allocate(h(0:NX+1,0:NY+1), u(0:NX+1,0:NY+1), v(0:NX+1,0:NY+1))
-    allocate(eta(0:NX+1,0:NY+1), w(0:NX+1,0:NY+1))
-    allocate(F(NEQS,0:NX+1,0:NY+1),G(NEQS,0:NX+1,0:NY+1),S(NEQS,0:NX+1,0:NY+1))
-
+    allocate(F(NEQS,0:NX+1,0:NY+1),h(0:NX+1,0:NY+1))
+    allocate(G,S,mold=F)
+    allocate(u,v,eta,w,mold=h)
 
     call set_bc(prim)
     call riemann_fluxes_x(prim,F,cmax1)
@@ -245,60 +223,27 @@ module methods
     return
   end subroutine timestep_godunov
 
-  subroutine get_solution_imex(prim,it,time,cmax)
-    use parameters
-    use model
-    implicit none
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    integer, intent(inout) :: it
-    real(kind=DP), intent(inout) :: time
-    real(kind=DP), intent(out) :: cmax
-    real(kind=DP) :: milestone=0.0d0, t1
-
-    do while(time<TIMEFINAL)
-      if (it.ge.ITFINAL) exit
-      call timestep_imex(prim,cmax)
-      call print_percentage(time,t1,milestone)
-      it=it+1
-      time=time+dt
-    enddo
-
-    return
-  end subroutine get_solution_imex
-
   subroutine timestep_imex(prim,cmax)
-    use parameters
-    use model
     implicit none
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
-    real(kind=DP), allocatable :: F(:,:,:),G(:,:,:),Fstar(:,:,:),Gstar(:,:,:),S(:,:,:)
+    real(kind=DP), allocatable :: F(:,:,:),G(:,:,:)
+    real(kind=DP), allocatable :: Fstar(:,:,:),Gstar(:,:,:),S(:,:,:)
     real(kind=DP), allocatable :: h(:,:),u(:,:),v(:,:),eta(:,:),w(:,:)
-    real(kind=DP), allocatable :: hstar(:,:),ustar(:,:),vstar(:,:),etastar(:,:),wstar(:,:)
+    real(kind=DP), allocatable :: hstar(:,:),ustar(:,:),vstar(:,:)
+    real(kind=DP), allocatable :: etastar(:,:),wstar(:,:)
     real(kind=DP), allocatable :: primstar(:,:,:)
     real(kind=DP) :: cmax1, cmax2
 
-    allocate(F(NEQS,0:NX+1,0:NY+1),G(NEQS,0:NX+1,0:NY+1),Fstar(NEQS,0:NX+1,0:NY+1))
-    allocate(Gstar(NEQS,0:NX+1,0:NY+1),S(NEQS,0:NX+1,0:NY+1))
-    allocate(h(0:NX+1,0:NY+1),u(0:NX+1,0:NY+1),v(0:NX+1,0:NY+1),eta(0:NX+1,0:NY+1))
-    allocate(w(0:NX+1,0:NY+1))
-
-    allocate(hstar(0:NX+1,0:NY+1),ustar(0:NX+1,0:NY+1),vstar(0:NX+1,0:NY+1))
-    allocate(etastar(0:NX+1,0:NY+1),wstar(0:NX+1,0:NY+1))
-    allocate(primstar(NEQS,0:NX+1,0:NY+1))
+    allocate(F(NEQS,0:NX+1,0:NY+1),h(0:NX+1,0:NY+1))
+    allocate(G,S,Fstar,Gstar,primstar,mold=F)
+    allocate(u,v,eta,w,hstar,ustar,vstar,etastar,wstar,mold=h)
 
     call set_bc(prim)
     call muscl_step_x(prim,F,cmax1)
     call muscl_step_y(prim,G,cmax2)
-    cmax = dmax1(cmax1,cmax2)
-    dt=CFL*DL/cmax
-    ! call godunov(cons,F,G)
-    ! call split_prims_gn(prim,h,u,v,eta,w)
-    ! call ode_exact_solution(h,u,v,eta,w)
-    ! call make_sources(h,eta,w,S)
-    ! call ode_euler_step(S,cons)
-    ! call cons_to_prim(cons,prim)
-
+    cmax = dmax1(cmax1,cmax2)         ! DELETE
+    dt=CFL*DL/cmax                    ! DELETE
     call split_prims_gn(prim,h,u,v,eta,w)
     call imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
     call make_sources(hstar,etastar,wstar,S)
@@ -322,7 +267,6 @@ module methods
   end subroutine timestep_imex
 
   subroutine set_bc(prim)
-    use parameters
     implicit none
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer :: i,j
@@ -347,7 +291,6 @@ module methods
   end subroutine set_bc
 
   subroutine riemann_fluxes_x(prim,flux,cmax)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
@@ -367,7 +310,6 @@ module methods
     return
   end subroutine riemann_fluxes_x
   subroutine riemann_fluxes_y(prim,flux,cmax)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
@@ -397,7 +339,6 @@ module methods
   end subroutine riemann_fluxes_y
 
   subroutine godunov(cons,F,G)
-    use parameters
     implicit none
 
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F,G
@@ -414,7 +355,6 @@ module methods
   end subroutine godunov
 
   subroutine split_prims_gn(prim,h,u,v,eta,w)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(out) :: h,u,v,eta,w
@@ -428,7 +368,6 @@ module methods
   end subroutine split_prims_gn
 
   subroutine merge_prims_gn(h,u,v,eta,w,prim)
-    use parameters
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
     real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
@@ -442,7 +381,6 @@ module methods
   end subroutine merge_prims_gn
 
   subroutine ode_exact_solution(h,u,v,eta,w)
-    use parameters
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
     real(kind=DP) :: etanew(0:NX+1,0:NY+1)
@@ -461,7 +399,6 @@ module methods
   end subroutine ode_exact_solution
 
   subroutine make_sources(h,eta,w,S)
-    use parameters
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,eta,w
     real(kind=DP), intent(out) :: S(NEQS,0:NX+1,0:NY+1)
@@ -476,7 +413,6 @@ module methods
   end subroutine make_sources
 
   subroutine ode_euler_step(S,cons)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: S(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
@@ -486,8 +422,7 @@ module methods
   end subroutine ode_euler_step
 
   subroutine muscl_step_x(prim,F,cmax)
-    use parameters
-    use aux
+    implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
@@ -501,7 +436,6 @@ module methods
   end subroutine muscl_step_x
 
   subroutine data_reconstruction_x(prim,primr,priml)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
@@ -514,7 +448,6 @@ module methods
   end subroutine data_reconstruction_x
 
   subroutine get_slopes_x(prim,slope)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
@@ -528,7 +461,6 @@ module methods
   end subroutine get_slopes_x
 
   subroutine set_bc_muscl_x(primr,priml)
-    use parameters
     implicit none
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
     integer :: j
@@ -545,7 +477,6 @@ module methods
   end subroutine set_bc_muscl_x
 
   subroutine riemann_fluxes_muscl_x(primr,priml,flux,cmax)
-    use parameters
     implicit none
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
     real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
@@ -565,8 +496,7 @@ module methods
   end subroutine riemann_fluxes_muscl_x
 
   subroutine muscl_step_y(prim,F,cmax)
-    use parameters
-    use aux
+    implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: cmax
@@ -580,7 +510,6 @@ module methods
   end subroutine muscl_step_y
 
   subroutine data_reconstruction_y(prim,primr,priml)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
@@ -593,7 +522,6 @@ module methods
   end subroutine data_reconstruction_y
 
   subroutine get_slopes_y(prim,slope)
-    use parameters
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
@@ -607,7 +535,6 @@ module methods
   end subroutine get_slopes_y
 
   subroutine set_bc_muscl_y(primr,priml)
-    use parameters
     implicit none
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
     integer :: i
@@ -624,7 +551,6 @@ module methods
   end subroutine set_bc_muscl_y
 
   subroutine riemann_fluxes_muscl_y(primr,priml,flux,cmax)
-    use parameters
     implicit none
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
     real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
@@ -662,7 +588,6 @@ module methods
   end subroutine riemann_fluxes_muscl_y
 
   subroutine imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
-    use parameters
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F, G
@@ -696,7 +621,6 @@ module methods
   end subroutine imex_step_1
 
   subroutine imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
-    use parameters
     implicit none
     real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1),intent(in):: F,G,Fstar,Gstar,S
@@ -749,8 +673,6 @@ module methods
   end subroutine imex_step_2
 
   subroutine hllc(priml,primr,F,cmax)
-    use parameters
-    use model
     implicit none
     real(kind=DP), intent(in) :: priml(NEQS), primr(NEQS)
     real(kind=DP), intent(out) :: F(NEQS)
@@ -766,8 +688,8 @@ module methods
     ul   = priml(2); ur   = primr(2)
     etal = priml(4); etar = primr(4)
 
-    pl = get_p(rhol, etal); pr = get_p(rhor, etar)
-    al = get_a(rhol, etal); ar = get_a(rhor, etar)
+    pl = pressure(rhol, etal); pr = pressure(rhor, etar)
+    al = sound_speed(rhol, etal); ar = sound_speed(rhor, etar)
 
     ! Wave speed estimation
     ! Davis S.F.(1988), 'Simplified second order Godunov type methods',
