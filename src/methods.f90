@@ -27,10 +27,10 @@ module methods
     integer :: i
 
     do i=0,NX+1
-      x(i) = XLEFT + 0.5d0*DX + DFLOAT(i-1)*DX
+      x(i) = XL + 0.5d0*DX + DFLOAT(i-1)*DX
     enddo
     do i=0,NY+1
-      y(i) = YLEFT + 0.5d0*DY + DFLOAT(i-1)*DY
+      y(i) = YL + 0.5d0*DY + DFLOAT(i-1)*DY
     enddo
 
     return
@@ -159,13 +159,12 @@ module methods
     return
   end subroutine cons_to_prim
 
-  subroutine get_solution(prim,cons,it,time,cmax)
+  subroutine get_solution(prim,cons,it,time)
     implicit none
     real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer, intent(inout) :: it
     real(kind=DP), intent(inout) :: time
-    real(kind=DP), intent(out) :: cmax
     real(kind=DP) :: milestone=0.0d0, t1
 
     print*, ''
@@ -178,9 +177,9 @@ module methods
 
       select case(SELECTOR_METHOD)
         case(METHOD_GODUNOV)
-          call timestep_godunov(prim,cons,cmax)
+          call timestep_godunov(prim,cons)
         case(METHOD_IMEX)
-          call timestep_imex(prim,cmax)
+          call timestep_imex(prim)
       end select
 
       call print_percentage(time,t1,milestone)
@@ -192,25 +191,21 @@ module methods
     return
   end subroutine get_solution
 
-  subroutine timestep_godunov(prim,cons,cmax)
+  subroutine timestep_godunov(prim,cons)
     implicit none
     real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: cmax
 
     real(kind=DP), allocatable :: F(:,:,:), G(:,:,:), S(:,:,:)
     real(kind=DP), allocatable :: h(:,:), u(:,:), v(:,:), eta(:,:), w(:,:)
-    real(kind=DP) :: cmax1, cmax2
 
     allocate(F(NEQS,0:NX+1,0:NY+1),h(0:NX+1,0:NY+1))
     allocate(G,S,mold=F)
     allocate(u,v,eta,w,mold=h)
 
     call set_bc(prim)
-    call riemann_fluxes_x(prim,F,cmax1)
-    call riemann_fluxes_y(prim,G,cmax2)
-    cmax = dmax1(cmax1,cmax2)
-    dt=CFL*DL/cmax
+    call riemann_fluxes_x(prim,F)
+    call riemann_fluxes_y(prim,G)
     call godunov(cons,F,G)
     call split_prims_gn(prim,h,u,v,eta,w)
     call ode_exact_solution(h,u,v,eta,w)
@@ -223,34 +218,30 @@ module methods
     return
   end subroutine timestep_godunov
 
-  subroutine timestep_imex(prim,cmax)
+  subroutine timestep_imex(prim)
     implicit none
     real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: cmax
     real(kind=DP), allocatable :: F(:,:,:),G(:,:,:)
     real(kind=DP), allocatable :: Fstar(:,:,:),Gstar(:,:,:),S(:,:,:)
     real(kind=DP), allocatable :: h(:,:),u(:,:),v(:,:),eta(:,:),w(:,:)
     real(kind=DP), allocatable :: hstar(:,:),ustar(:,:),vstar(:,:)
     real(kind=DP), allocatable :: etastar(:,:),wstar(:,:)
     real(kind=DP), allocatable :: primstar(:,:,:)
-    real(kind=DP) :: cmax1, cmax2
 
     allocate(F(NEQS,0:NX+1,0:NY+1),h(0:NX+1,0:NY+1))
     allocate(G,S,Fstar,Gstar,primstar,mold=F)
     allocate(u,v,eta,w,hstar,ustar,vstar,etastar,wstar,mold=h)
 
     call set_bc(prim)
-    call muscl_step_x(prim,F,cmax1)
-    call muscl_step_y(prim,G,cmax2)
-    cmax = dmax1(cmax1,cmax2)         ! DELETE
-    dt=CFL*DL/cmax                    ! DELETE
+    call muscl_step_x(prim,F)
+    call muscl_step_y(prim,G)
     call split_prims_gn(prim,h,u,v,eta,w)
     call imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
     call make_sources(hstar,etastar,wstar,S)
     call merge_prims_gn(hstar,ustar,vstar,etastar,wstar,primstar)
     call set_bc(primstar)
-    call muscl_step_x(primstar,Fstar,cmax1)
-    call muscl_step_y(primstar,Gstar,cmax2)
+    call muscl_step_x(primstar,Fstar)
+    call muscl_step_y(primstar,Gstar)
     call imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
     call merge_prims_gn(h,u,v,eta,w,prim)
 
@@ -290,33 +281,31 @@ module methods
     return
   end subroutine set_bc
 
-  subroutine riemann_fluxes_x(prim,flux,cmax)
+  subroutine riemann_fluxes_x(prim,flux)
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
+    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(NEQS) :: priml, primr, F
     integer :: i,j
 
-    cmax = 0.0d0
     do j=1,NY
-      do i=0,Nx
+      do i=0,NX
         priml = prim(:,i,j)
         primr = prim(:,i+1,j)
-        call hllc(priml,primr,F,cmax)
+        call hllc(priml,primr,F)
         flux(:,i,j) = F
       enddo
     enddo
 
     return
   end subroutine riemann_fluxes_x
-  subroutine riemann_fluxes_y(prim,flux,cmax)
+  subroutine riemann_fluxes_y(prim,flux)
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
+    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(NEQS) :: priml, primr, F
     integer :: i,j
 
-    cmax = 0.0d0
     do i=1,NX
       do j=0,NY
         priml = prim(:,i,j)
@@ -327,7 +316,7 @@ module methods
         primr(2) = prim(3,i,j+1)
         primr(3) = prim(2,i,j+1)
 
-        call hllc(priml,primr,F,cmax)
+        call hllc(priml,primr,F)
 
         flux(:,i,j) = F
         flux(2,i,j) = F(3)
@@ -345,10 +334,10 @@ module methods
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: cons
     integer :: i,j
 
-    do j=1,Ny
-      do i=1,Nx
+    do j=1,NY
+      do i=1,NX
         cons(:,i,j)=cons(:,i,j)-dt/dV*( dy*(F(:,i,j)-F(:,i-1,j))&
-                                       +dx*(G(:,i,j)-G(:,i,j-1)) )
+                                       +DX*(G(:,i,j)-G(:,i,j-1)) )
       enddo
     enddo
     return
@@ -421,16 +410,15 @@ module methods
     return
   end subroutine ode_euler_step
 
-  subroutine muscl_step_x(prim,F,cmax)
+  subroutine muscl_step_x(prim,F)
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: cmax
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
 
     call data_reconstruction_x(prim,primr,priml)
     call set_bc_muscl_x(primr,priml)
-    call riemann_fluxes_muscl_x(primr,priml,F,cmax)
+    call riemann_fluxes_muscl_x(primr,priml,F)
 
     return
   end subroutine muscl_step_x
@@ -476,35 +464,33 @@ module methods
     return
   end subroutine set_bc_muscl_x
 
-  subroutine riemann_fluxes_muscl_x(primr,priml,flux,cmax)
+  subroutine riemann_fluxes_muscl_x(primr,priml,flux)
     implicit none
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
+    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(NEQS) :: statel, stater, F
     integer :: i,j
 
-    cmax = 0.0d0
     do j=1,NY
-      do i=0,Nx
+      do i=0,NX
         statel = priml(:,i,j)
         stater = primr(:,i+1,j)
-        call hllc(statel,stater,F,cmax)
+        call hllc(statel,stater,F)
         flux(:,i,j) = F
       enddo
     enddo
     return
   end subroutine riemann_fluxes_muscl_x
 
-  subroutine muscl_step_y(prim,F,cmax)
+  subroutine muscl_step_y(prim,F)
     implicit none
     real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: cmax
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
 
     call data_reconstruction_y(prim,primr,priml)
     call set_bc_muscl_y(primr,priml)
-    call riemann_fluxes_muscl_y(primr,priml,F,cmax)
+    call riemann_fluxes_muscl_y(primr,priml,F)
 
     return
   end subroutine muscl_step_y
@@ -550,22 +536,13 @@ module methods
     return
   end subroutine set_bc_muscl_y
 
-  subroutine riemann_fluxes_muscl_y(primr,priml,flux,cmax)
+  subroutine riemann_fluxes_muscl_y(primr,priml,flux)
     implicit none
     real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1), cmax
+    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), dimension(NEQS) :: statel, stater, F
     integer :: i,j
 
-    cmax = 0.0d0
-    do j=1,NY
-      do i=0,Nx
-        statel = priml(:,i,j)
-        stater = primr(:,i+1,j)
-        call hllc(statel,stater,F,cmax)
-        flux(:,i,j) = F
-      enddo
-    enddo
     do i=1,NX
       do j=0,NY
         statel = priml(:,i,j)
@@ -576,7 +553,7 @@ module methods
         stater(2) = primr(3,i,j+1)
         stater(3) = primr(2,i,j+1)
 
-        call hllc(statel,stater,F,cmax)
+        call hllc(statel,stater,F)
 
         flux(:,i,j) = F
         flux(2,i,j) = F(3)
@@ -599,15 +576,15 @@ module methods
     do i=1,NX
       do j=1,NY
         hstar(i,j) = h(i,j) - DELTA*(dy*(F(1,i,j)-F(1,i-1,j))&
-                                     +dx*(G(1,i,j)-G(1,i,j-1)))*dt/dV
+                                     +DX*(G(1,i,j)-G(1,i,j-1)))*dt/dV
         ustar(i,j) = ( h(i,j)*u(i,j) - DELTA*(dy*(F(2,i,j)-F(2,i-1,j))&
-                         +dx*(G(2,i,j)-G(2,i,j-1)))*dt/dV )/hstar(i,j)
+                         +DX*(G(2,i,j)-G(2,i,j-1)))*dt/dV )/hstar(i,j)
         vstar(i,j) = ( h(i,j)*v(i,j) - DELTA*(dy*(F(3,i,j)-F(3,i-1,j))&
-                         +dx*(G(3,i,j)-G(3,i,j-1)))*dt/dV )/hstar(i,j)
+                         +DX*(G(3,i,j)-G(3,i,j-1)))*dt/dV )/hstar(i,j)
         C4 = ( h(i,j)*eta(i,j) - DELTA*(dy*(F(4,i,j)-F(4,i-1,j))&
-                         +dx*(G(4,i,j)-G(4,i,j-1)))*dt/dV )/hstar(i,j)
+                         +DX*(G(4,i,j)-G(4,i,j-1)))*dt/dV )/hstar(i,j)
         C5 = ( h(i,j)*w(i,j) - DELTA*(dy*(F(5,i,j)-F(5,i-1,j))&
-                         +dx*(G(5,i,j)-G(5,i,j-1)))*dt/dV )/hstar(i,j)
+                         +DX*(G(5,i,j)-G(5,i,j-1)))*dt/dV )/hstar(i,j)
         alpha = 1.0d0/(1.0d0 +LAMBDA*DELTA*DELTA*dt*dt/(hstar(i,j)*hstar(i,j)))
 
         etastar(i,j) = alpha*( C4 + DELTA*dt*C5&
@@ -630,34 +607,34 @@ module methods
     do i=1,NX
       do j=1,NY
         hnew = h(i,j) - (DELTA-1.0d0)*(dy*(F(1,i,j)-F(1,i-1,j))&
-                        + dx*(G(1,i,j)-G(1,i,j-1)))*dt/dV &
+                        + DX*(G(1,i,j)-G(1,i,j-1)))*dt/dV &
                       - (2.0d0 - DELTA)*(dy*(Fstar(1,i,j)-Fstar(1,i-1,j))&
-                        + dx*(Gstar(1,i,j)-Gstar(1,i,j-1)))*dt/dV
+                        + DX*(Gstar(1,i,j)-Gstar(1,i,j-1)))*dt/dV
 
         u(i,j) = ( h(i,j)*u(i,j)&
                   - (DELTA-1.0d0)*(dy*(F(2,i,j)-F(2,i-1,j))&
-                    + dx*(G(2,i,j)-G(2,i,j-1)))*dt/dV &
+                    + DX*(G(2,i,j)-G(2,i,j-1)))*dt/dV &
                   - (2.0d0 - DELTA)*(dy*(Fstar(2,i,j)-Fstar(2,i-1,j))&
-                    + dx*(Gstar(2,i,j)-Gstar(2,i,j-1)))*dt/dV )/hnew
+                    + DX*(Gstar(2,i,j)-Gstar(2,i,j-1)))*dt/dV )/hnew
 
         v(i,j) = ( h(i,j)*v(i,j)&
                   - (DELTA-1.0d0)*(dy*(F(3,i,j)-F(3,i-1,j))&
-                    + dx*(G(3,i,j)-G(3,i,j-1)))*dt/dV &
+                    + DX*(G(3,i,j)-G(3,i,j-1)))*dt/dV &
                   - (2.0d0 - DELTA)*(dy*(Fstar(3,i,j)-Fstar(3,i-1,j))&
-                    + dx*(Gstar(3,i,j)-Gstar(3,i,j-1)))*dt/dV )/hnew
+                    + DX*(Gstar(3,i,j)-Gstar(3,i,j-1)))*dt/dV )/hnew
 
         C4 = ( h(i,j)*eta(i,j)&
                 - (DELTA-1.0d0)*(dy*(F(4,i,j)-F(4,i-1,j))&
-                  + dx*(G(4,i,j)-G(4,i,j-1)))*dt/dV &
+                  + DX*(G(4,i,j)-G(4,i,j-1)))*dt/dV &
                 - (2.0d0 - DELTA)*(dy*(Fstar(4,i,j)-Fstar(4,i-1,j))&
-                  + dx*(Gstar(4,i,j)-Gstar(4,i,j-1)))*dt/dV&
+                  + DX*(Gstar(4,i,j)-Gstar(4,i,j-1)))*dt/dV&
                             + (1.0d0 - DELTA)*dt*S(4,i,j) )/hnew
 
         C5 = ( h(i,j)*w(i,j)&
                 - (DELTA-1.0d0)*(dy*(F(5,i,j)-F(5,i-1,j))&
-                  + dx*(G(5,i,j)-G(5,i,j-1)))*dt/dV &
+                  + DX*(G(5,i,j)-G(5,i,j-1)))*dt/dV &
                 - (2.0d0 - DELTA)*(dy*(Fstar(5,i,j)-Fstar(5,i-1,j))&
-                  + dx*(Gstar(5,i,j)-Gstar(5,i,j-1)))*dt/dV&
+                  + DX*(Gstar(5,i,j)-Gstar(5,i,j-1)))*dt/dV&
                             + (1.0d0 - DELTA)*dt*S(5,i,j) )/hnew
 
         alpha = 1.0d0/( 1.0d0 + DELTA*DELTA*dt*dt*LAMBDA/(hnew*hnew) )
@@ -672,11 +649,10 @@ module methods
     return
   end subroutine imex_step_2
 
-  subroutine hllc(priml,primr,F,cmax)
+  subroutine hllc(priml,primr,F)
     implicit none
     real(kind=DP), intent(in) :: priml(NEQS), primr(NEQS)
     real(kind=DP), intent(out) :: F(NEQS)
-    real(kind=DP), intent(inout) :: cmax
     real(kind=DP) :: rhol, rhor, ul, ur, etal, etar, pl, pr, al, ar
     real(kind=DP) :: sl, sr, sl1, sl2, sr1, sr2, smid
     real(kind=DP) :: rhostarl, rhostarr
@@ -697,7 +673,6 @@ module methods
     sl1=ul-al; sl2=ur-ar
     sr1=ul+al; sr2=ur+ar
     sl=DMIN1(sl1,sl2); sr=DMAX1(sr1,sr2)
-    cmax = DMAX1(cmax,sl,sr)
 
     consl(1) = rhol; consr(1) = rhor
     do k=2, NEQS

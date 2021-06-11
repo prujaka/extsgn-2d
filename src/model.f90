@@ -29,7 +29,7 @@ module model
     do i=1,NX
       do j=1,NY
       c = sound_speed(h(i,j),eta(i,j))
-      cmax = max( cmax, (dabs(u(i,j)) + c)/dx + (dabs(v(i,j)) + c)/dy )
+      cmax = max( cmax, (dabs(u(i,j)) + c)/DX + (dabs(v(i,j)) + c)/dy )
       enddo
     enddo
     compute_dt = CFL/cmax

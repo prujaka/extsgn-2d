@@ -6,7 +6,7 @@ program extsgn_imex2d
   implicit none
   integer :: it
   real :: t1,t2
-  real(kind=DP) :: time, cmax
+  real(kind=DP) :: time
   real(kind=DP), allocatable :: x(:),y(:)
   real(kind=DP), allocatable :: prim(:,:,:), cons(:,:,:)
 
@@ -16,12 +16,12 @@ program extsgn_imex2d
   call cpu_time(t1)
 
   call initialize_problem(x,y,prim,cons,it,time)
-  call get_solution(prim,cons,it,time,cmax)
+  call get_solution(prim,cons,it,time)
   call output_solution(OUTPUT_FILE,x,y,prim,time)
 
   call cpu_time(t2)
 
-  call print_output_message(it,time,t1,t2,cmax)
+  call print_output_message(it,time,t1,t2)
 
   deallocate(x,y,prim,cons)
 
