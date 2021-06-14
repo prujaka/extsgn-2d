@@ -17,7 +17,9 @@ program extsgn_imex2d
 
   call initialize_problem(x,y,prim,cons,it,time)
   call get_solution(prim,cons,it,time)
-  call output_solution(OUTPUT_FILE,x,y,prim,time)
+
+  call output_dat(x,y,prim,time)
+  call output_vtk(prim(1,:,:),prim(2,:,:),prim(3,:,:))
 
   call cpu_time(t2)
 

@@ -2,4 +2,6 @@
 *.mod
 *.out
 *.eps
+*.vtk
+*.dat
 exe

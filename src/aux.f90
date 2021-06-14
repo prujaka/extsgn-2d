@@ -22,14 +22,13 @@ contains
     return
   end
 
-  subroutine output_solution(filename,x,y,prim,time)
+  subroutine output_dat(x,y,prim,time)
     implicit none
-    character(len=OUTPUT_FILENAME_LENGTH), intent(in) :: filename
     real(kind=DP), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)
     real(kind=DP), intent(in) :: time
     integer :: i,k,j
 
-    open(unit=10,file=filename)
+    open(unit=10,file=FILE_DAT)
     do i=1, NX
       do j=1, NY
         write(10,FMT=DATA_FORMAT) x(i), y(j), (prim(k,i,j), k=1,NEQS), time
@@ -37,12 +36,10 @@ contains
     enddo
     close(10)
     return
-  end subroutine output_solution
+  end subroutine output_dat
 
-  subroutine output_vtk(step,h,u,v,vtk_file)
+  subroutine output_vtk(h,u,v)
   implicit none
-  integer, intent(in) :: step
-  character(Len=7), intent(in)  :: vtk_file
   real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v!,eta,w,p
   real(kind=DP) :: x_0,y_0
   integer :: i,j,unit
@@ -51,31 +48,31 @@ contains
   y_0 = 0.5d0*(YL + YR)
 
   unit = 10
-  open(unit,file=vtk_file)
+  open(unit,file=FILE_VTK)
     write(unit,'(''# vtk DataFile Version 2.0'')')
     write(unit,'(''Rectilinear 3D Dataset'')')
     write(unit,'(''ASCII'')')
     write(unit,'('' '')')
     write(unit,'(''DATASET STRUCTURED_POINTS'')')
-    write(unit,FMT='(''DIMENSIONS'',I8,I8,I8)') NX/step+1, NY/step+1, 2
+    write(unit,FMT='(''DIMENSIONS'',I8,I8,I8)') NX/VTK_STEP+1, NY/VTK_STEP+1, 1
     write(unit,FMT='(''ORIGIN '',3(E11.4,1x))') x_0, y_0, 0.d0
-    write(unit,FMT='(''SPACING'',3(E11.4,1x))') DFLOAT(step)*DX,&
-                                                DFLOAT(step)*DY,0.0001d0
+    write(unit,FMT='(''SPACING'',3(E11.4,1x))') DFLOAT(VTK_STEP)*DX,&
+                                                DFLOAT(VTK_STEP)*DY,0.0001d0
     write(unit,*) ' '
-    write(unit,FMT='(''CELL_DATA '',I9)') NX/step*NY/step*1
+    write(unit,FMT='(''CELL_DATA '',I9)') NX/VTK_STEP*NY/VTK_STEP*1
     write(unit,*) ' '
 
     write(unit,FMT='(''SCALARS '',A6, '' float 1'')') 'depth'
     write(unit,'(''LOOKUP_TABLE default'')')
-    do j=1,NY,step
-      do i=1,NX,step
+    do j=1,NY,VTK_STEP
+      do i=1,NX,VTK_STEP
         write(unit,'(G11.4)') h(i,j)
       enddo
     enddo
 
     write(unit,FMT='(''VECTORS '',A13, '' float'')') 'velocity(m/s)'
-    do j=1,NY,step
-      do i=1,NX,step
+    do j=1,NY,VTK_STEP
+      do i=1,NX,VTK_STEP
         write(unit,'(3(E11.4,1x))') u(i,j), v(i,j), 0.d0
       enddo
     enddo
@@ -86,7 +83,7 @@ end
 
   subroutine output_single_prim_matrix(filename,array)
     implicit none
-    character(len=OUTPUT_FILENAME_LENGTH), intent(in) :: filename
+    character(len=NAMELEN), intent(in) :: filename
     real(kind=DP), intent(in) :: array(0:NX+1,0:NY+1)
     integer :: i, j
 
