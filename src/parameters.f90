@@ -3,9 +3,9 @@ module parameters
   integer, parameter       :: DP        = kind(1.0d0)
   integer, parameter       :: NEQS      = 5 ! Must be superior or equal to 5
 
-  integer, parameter       :: NX        = 100
-  integer, parameter       :: NY        = 100
-  real(kind=dp), parameter :: LAMBDA    = 100.0d0
+  integer, parameter       :: NX        = 200
+  integer, parameter       :: NY        = 200
+  real(kind=dp), parameter :: LAMBDA    = 10.0d0
   real(kind=dp), parameter :: TFIN      = 40.0d0
   real(kind=dp), parameter :: CFL       = 0.5d0
   integer, parameter       :: ITFIN     = 100000000

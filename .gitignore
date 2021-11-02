@@ -1,7 +1,6 @@
 .DS_Store
-*.mod
-*.out
-*.eps
-*.vtk
-*.dat
+**.mod
+**.eps
+**.vtk
+**.dat
 exe
