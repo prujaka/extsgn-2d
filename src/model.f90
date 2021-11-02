@@ -5,7 +5,7 @@ module model
 
   real(8) function pressure(h, eta)
     implicit none
-    real(kind=DP), intent(in) :: h, eta
+    real(dp), intent(in) :: h, eta
 
     pressure = 0.5d0*gg*h*h - LAMBDA*eta*(eta/h-1.0d0)/3.0d0
     return
@@ -13,7 +13,7 @@ module model
 
   real(8) function sound_speed(h, eta)
     implicit none
-    real(kind=DP), intent(in) :: h, eta
+    real(dp), intent(in) :: h, eta
 
     sound_speed = DSQRT(gg*h + LAMBDA*eta*eta/(h*h)/3.0d0)
     return
@@ -21,8 +21,8 @@ module model
 
   real(8) function compute_dt(h,u,v,eta)
     implicit none
-    real(kind=DP), dimension(0:NX+1, 0:NY+1), intent(in) :: h, u, v, eta
-    real(kind=DP) :: cmax, c
+    real(dp), dimension(0:NX+1, 0:NY+1), intent(in) :: h, u, v, eta
+    real(dp) :: cmax, c
     integer :: i,j
 
     cmax = 0.0d0

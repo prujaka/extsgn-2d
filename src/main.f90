@@ -6,9 +6,9 @@ program extsgn_imex2d
   implicit none
   integer :: it
   real :: t1,t2
-  real(kind=DP) :: time
-  real(kind=DP), allocatable :: x(:),y(:)
-  real(kind=DP), allocatable :: prim(:,:,:), cons(:,:,:)
+  real(dp) :: time
+  real(dp), allocatable :: x(:),y(:)
+  real(dp), allocatable :: prim(:,:,:), cons(:,:,:)
 
   allocate(x(0:NX+1), y(0:NY+1))
   allocate(prim(NEQS, 0:NX+1, 0:NY+1), cons(NEQS, 0:NX+1, 0:NY+1))

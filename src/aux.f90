@@ -5,10 +5,10 @@ contains
 
   subroutine print_percentage(time,t1,milestone)
     implicit none
-    real(kind=DP), intent(in) :: time
-    real(kind=DP), intent(inout) :: t1
-    real(kind=DP) :: milestone
-    real(kind=DP) :: t2, percentage
+    real(dp), intent(in) :: time
+    real(dp), intent(inout) :: t1
+    real(dp) :: milestone
+    real(dp) :: t2, percentage
 
     percentage = time*100.0d0/TFIN
     if (percentage > milestone) then
@@ -24,8 +24,8 @@ contains
 
   subroutine output_dat(x,y,prim,time)
     implicit none
-    real(kind=DP), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(in) :: time
+    real(dp), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: time
     integer :: i,k,j
 
     open(unit=10,file=FILE_DAT)
@@ -40,8 +40,8 @@ contains
 
   subroutine output_vtk(h,u,v)
   implicit none
-  real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v!,eta,w,p
-  real(kind=DP) :: x_0,y_0
+  real(dp), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v!,eta,w,p
+  real(dp) :: x_0,y_0
   integer :: i,j,unit
 
   x_0 = 0.5d0*(XL + XR)
@@ -84,7 +84,7 @@ end
   subroutine output_single_prim_matrix(filename,array)
     implicit none
     character(len=NAMELEN), intent(in) :: filename
-    real(kind=DP), intent(in) :: array(0:NX+1,0:NY+1)
+    real(dp), intent(in) :: array(0:NX+1,0:NY+1)
     integer :: i, j
 
     open(unit=10,file=filename)
@@ -99,7 +99,7 @@ end
     implicit none
     integer, intent(in) :: it
     real, intent(in) :: t1,t2
-    real(kind=DP), intent(in) :: time
+    real(dp), intent(in) :: time
 
     print*, ''
     write(*,*) 'NX', NX

@@ -7,8 +7,8 @@ module methods
 
   subroutine initialize_problem(x,y,prim,cons,it,time)
     implicit none
-    real(kind=DP), intent(out) :: x(0:NX+1), y(0:NY+1), time
-    real(kind=DP), dimension(NEQS, 0:NX+1, 0:NY+1),intent(out) :: prim, cons
+    real(dp), intent(out) :: x(0:NX+1), y(0:NY+1), time
+    real(dp), dimension(NEQS, 0:NX+1, 0:NY+1),intent(out) :: prim, cons
     integer, intent(out) :: it
 
     call set_mesh(x,y)
@@ -22,8 +22,8 @@ module methods
 
   subroutine set_mesh(x,y)
     implicit none
-    real(kind=DP), intent(out) :: x(0:NX+1)
-    real(kind=DP), intent(out) :: y(0:NY+1)
+    real(dp), intent(out) :: x(0:NX+1)
+    real(dp), intent(out) :: y(0:NY+1)
     integer :: i
 
     do i=0,NX+1
@@ -38,8 +38,8 @@ module methods
 
   subroutine set_ic(x,y,prim)
     implicit none
-    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
-    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
 
     select case(SELECTOR_IC)
       case(IC_RP_X)
@@ -56,8 +56,8 @@ module methods
 
   subroutine set_ic_rp_x(x,prim)
     implicit none
-    real(kind=DP), intent(in)  :: x(0:NX+1)
-    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp), intent(in)  :: x(0:NX+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
     integer :: i, j
 
     do j=1, NY
@@ -82,8 +82,8 @@ module methods
   end subroutine set_ic_rp_x
   subroutine set_ic_rp_y(y,prim)
     implicit none
-    real(kind=DP), intent(in)  :: y(0:NY+1)
-    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp), intent(in)  :: y(0:NY+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
     integer :: i, j
 
     do j=1, NY
@@ -108,8 +108,8 @@ module methods
   end subroutine set_ic_rp_y
   subroutine set_ic_rp_cyl(x,y,prim)
     implicit none
-    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
-    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
     integer :: i, j
 
     do j=1, NY
@@ -134,8 +134,8 @@ module methods
   end subroutine set_ic_rp_cyl
   subroutine set_ic_rp_sqr(x,y,prim)
     implicit none
-    real(kind=DP), intent(in)  :: x(0:NX+1), y(0:NY+1)
-    real(kind=DP), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
     integer :: i, j
 
     do j=1, NY
@@ -161,8 +161,8 @@ module methods
 
   subroutine prim_to_cons(prim,cons)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: cons(NEQS,0:NX+1,0:NY+1)
     integer :: k
 
     cons(1,:,:) = prim(1,:,:)
@@ -175,8 +175,8 @@ module methods
 
   subroutine cons_to_prim(cons,prim)
     implicit none
-    real(kind=DP), intent(in) :: cons(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
     integer :: k
 
     prim(1,:,:) = cons(1,:,:)
@@ -189,11 +189,11 @@ module methods
 
   subroutine get_solution(prim,cons,it,time)
     implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer, intent(inout) :: it
-    real(kind=DP), intent(inout) :: time
-    real(kind=DP) :: milestone=0.0d0, t1
+    real(dp), intent(inout) :: time
+    real(dp) :: milestone=0.0d0, t1
 
     print*, ''
     print*, 'Calculation started.'
@@ -221,11 +221,11 @@ module methods
 
   subroutine timestep_godunov(prim,cons)
     implicit none
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
 
-    real(kind=DP), allocatable :: F(:,:,:), G(:,:,:), S(:,:,:)
-    real(kind=DP), allocatable :: h(:,:), u(:,:), v(:,:), eta(:,:), w(:,:)
+    real(dp), allocatable :: F(:,:,:), G(:,:,:), S(:,:,:)
+    real(dp), allocatable :: h(:,:), u(:,:), v(:,:), eta(:,:), w(:,:)
 
     allocate(F(NEQS,0:NX+1,0:NY+1),h(0:NX+1,0:NY+1))
     allocate(G,S,mold=F)
@@ -248,13 +248,13 @@ module methods
 
   subroutine timestep_imex(prim)
     implicit none
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), allocatable :: F(:,:,:),G(:,:,:)
-    real(kind=DP), allocatable :: Fstar(:,:,:),Gstar(:,:,:),S(:,:,:)
-    real(kind=DP), allocatable :: h(:,:),u(:,:),v(:,:),eta(:,:),w(:,:)
-    real(kind=DP), allocatable :: hstar(:,:),ustar(:,:),vstar(:,:)
-    real(kind=DP), allocatable :: etastar(:,:),wstar(:,:)
-    real(kind=DP), allocatable :: primstar(:,:,:)
+    real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), allocatable :: F(:,:,:),G(:,:,:)
+    real(dp), allocatable :: Fstar(:,:,:),Gstar(:,:,:),S(:,:,:)
+    real(dp), allocatable :: h(:,:),u(:,:),v(:,:),eta(:,:),w(:,:)
+    real(dp), allocatable :: hstar(:,:),ustar(:,:),vstar(:,:)
+    real(dp), allocatable :: etastar(:,:),wstar(:,:)
+    real(dp), allocatable :: primstar(:,:,:)
 
     allocate(F(NEQS,0:NX+1,0:NY+1),h(0:NX+1,0:NY+1))
     allocate(G,S,Fstar,Gstar,primstar,mold=F)
@@ -287,7 +287,7 @@ module methods
 
   subroutine set_bc(prim)
     implicit none
-    real(kind=DP), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer :: i,j
 
     do j=1,NY
@@ -311,9 +311,9 @@ module methods
 
   subroutine riemann_fluxes_x(prim,flux)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS) :: priml, primr, F
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS) :: priml, primr, F
     integer :: i,j
 
     do j=1,NY
@@ -329,9 +329,9 @@ module methods
   end subroutine riemann_fluxes_x
   subroutine riemann_fluxes_y(prim,flux)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS) :: priml, primr, F
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS) :: priml, primr, F
     integer :: i,j
 
     do i=1,NX
@@ -358,8 +358,8 @@ module methods
   subroutine godunov(cons,F,G)
     implicit none
 
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F,G
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: cons
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F,G
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: cons
     integer :: i,j
 
     do j=1,NY
@@ -373,8 +373,8 @@ module methods
 
   subroutine split_prims_gn(prim,h,u,v,eta,w)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(out) :: h,u,v,eta,w
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(0:NX+1,0:NY+1), intent(out) :: h,u,v,eta,w
 
     h(:,:) = prim(1,:,:)
     u(:,:) = prim(2,:,:)
@@ -386,8 +386,8 @@ module methods
 
   subroutine merge_prims_gn(h,u,v,eta,w,prim)
     implicit none
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
-    real(kind=DP), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
+    real(dp), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
 
     prim(1,:,:) = h(:,:)
     prim(2,:,:) = u(:,:)
@@ -399,8 +399,8 @@ module methods
 
   subroutine ode_exact_solution(h,u,v,eta,w)
     implicit none
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
-    real(kind=DP) :: etanew(0:NX+1,0:NY+1)
+    real(dp), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
+    real(dp) :: etanew(0:NX+1,0:NY+1)
 
     h(:,:) = h(:,:)
     u(:,:) = u(:,:)
@@ -417,8 +417,8 @@ module methods
 
   subroutine make_sources(h,eta,w,S)
     implicit none
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,eta,w
-    real(kind=DP), intent(out) :: S(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(0:NX+1,0:NY+1), intent(in) :: h,eta,w
+    real(dp), intent(out) :: S(NEQS,0:NX+1,0:NY+1)
 
     S(1,:,:) = 0.0d0
     S(2,:,:) = 0.0d0
@@ -431,8 +431,8 @@ module methods
 
   subroutine ode_euler_step(S,cons)
     implicit none
-    real(kind=DP), intent(in) :: S(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: S(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
 
     cons(:,:,:) = cons(:,:,:) + dt * S(:,:,:)
     return
@@ -440,9 +440,9 @@ module methods
 
   subroutine muscl_step_x(prim,F)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
 
     call data_reconstruction_x(prim,primr,priml)
     call set_bc_muscl_x(primr,priml)
@@ -453,9 +453,9 @@ module methods
 
   subroutine data_reconstruction_x(prim,primr,priml)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
-    real(kind=DP) :: slope(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
+    real(dp) :: slope(NEQS,0:NX+1,0:NY+1)
 
     call get_slopes_x(prim,slope)
     primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
@@ -465,8 +465,8 @@ module methods
 
   subroutine get_slopes_x(prim,slope)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
     integer :: i
 
     do i=1,NX
@@ -478,7 +478,7 @@ module methods
 
   subroutine set_bc_muscl_x(primr,priml)
     implicit none
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
     integer :: j
 
     do j=1,NY
@@ -494,9 +494,9 @@ module methods
 
   subroutine riemann_fluxes_muscl_x(primr,priml,flux)
     implicit none
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS) :: statel, stater, F
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
+    real(dp), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS) :: statel, stater, F
     integer :: i,j
 
     do j=1,NY
@@ -512,9 +512,9 @@ module methods
 
   subroutine muscl_step_y(prim,F)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: F(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1) :: primr,priml
 
     call data_reconstruction_y(prim,primr,priml)
     call set_bc_muscl_y(primr,priml)
@@ -525,9 +525,9 @@ module methods
 
   subroutine data_reconstruction_y(prim,primr,priml)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
-    real(kind=DP) :: slope(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(out) :: primr,priml
+    real(dp) :: slope(NEQS,0:NX+1,0:NY+1)
 
     call get_slopes_y(prim,slope)
     primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
@@ -537,8 +537,8 @@ module methods
 
   subroutine get_slopes_y(prim,slope)
     implicit none
-    real(kind=DP), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(out) :: slope(NEQS,0:NX+1,0:NY+1)
     integer :: j
 
     do j=1,NY
@@ -550,7 +550,7 @@ module methods
 
   subroutine set_bc_muscl_y(primr,priml)
     implicit none
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(inout) :: primr,priml
     integer :: i
 
     do i=1,NX
@@ -566,9 +566,9 @@ module methods
 
   subroutine riemann_fluxes_muscl_y(primr,priml,flux)
     implicit none
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
-    real(kind=DP), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
-    real(kind=DP), dimension(NEQS) :: statel, stater, F
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: primr,priml
+    real(dp), intent(out) :: flux(NEQS,0:NX+1,0:NY+1)
+    real(dp), dimension(NEQS) :: statel, stater, F
     integer :: i,j
 
     do i=1,NX
@@ -594,11 +594,11 @@ module methods
 
   subroutine imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
     implicit none
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F, G
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(out) :: hstar,ustar,vstar,&
+    real(dp), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v,eta,w
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1), intent(in) :: F, G
+    real(dp), dimension(0:NX+1,0:NY+1), intent(out) :: hstar,ustar,vstar,&
                                                             etastar,wstar
-    real(kind=DP) :: alpha, C4, C5
+    real(dp) :: alpha, C4, C5
     integer :: i,j
 
     do i=1,NX
@@ -627,9 +627,9 @@ module methods
 
   subroutine imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
     implicit none
-    real(kind=DP), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
-    real(kind=DP), dimension(NEQS,0:NX+1,0:NY+1),intent(in):: F,G,Fstar,Gstar,S
-    real(kind=DP) :: alpha, C4, C5, hnew
+    real(dp), dimension(0:NX+1,0:NY+1), intent(inout) :: h,u,v,eta,w
+    real(dp), dimension(NEQS,0:NX+1,0:NY+1),intent(in):: F,G,Fstar,Gstar,S
+    real(dp) :: alpha, C4, C5, hnew
     integer :: i,j
 
     do i=1,NX
@@ -679,13 +679,13 @@ module methods
 
   subroutine hllc(priml,primr,F)
     implicit none
-    real(kind=DP), intent(in) :: priml(NEQS), primr(NEQS)
-    real(kind=DP), intent(out) :: F(NEQS)
-    real(kind=DP) :: rhol, rhor, ul, ur, etal, etar, pl, pr, al, ar
-    real(kind=DP) :: sl, sr, sl1, sl2, sr1, sr2, smid
-    real(kind=DP) :: rhostarl, rhostarr
-    real(kind=DP), dimension(NEQS) :: consl, consr, Fl, Fr
-    real(kind=DP), dimension(NEQS) :: consstarl, consstarr, Fstarl, Fstarr
+    real(dp), intent(in) :: priml(NEQS), primr(NEQS)
+    real(dp), intent(out) :: F(NEQS)
+    real(dp) :: rhol, rhor, ul, ur, etal, etar, pl, pr, al, ar
+    real(dp) :: sl, sr, sl1, sl2, sr1, sr2, smid
+    real(dp) :: rhostarl, rhostarr
+    real(dp), dimension(NEQS) :: consl, consr, Fl, Fr
+    real(dp), dimension(NEQS) :: consstarl, consstarr, Fstarl, Fstarr
     integer :: k
 
     rhol = priml(1); rhor = primr(1)
