@@ -10,9 +10,11 @@ module methods
     real(dp), intent(out) :: x(0:NX+1), y(0:NY+1), time
     real(dp), dimension(NEQS, 0:NX+1, 0:NY+1),intent(out) :: prim, cons
     integer, intent(out) :: it
+    character(len=20) :: filename = 'img/file.txt'
 
     call set_mesh(x,y)
-    call set_ic(x,y,prim)
+    ! call set_ic(x,y,prim)
+    call input_matrix_flat(prim, filename)
     call prim_to_cons(prim,cons)
     it = 0
     time = 0.0d0

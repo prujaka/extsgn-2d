@@ -22,6 +22,27 @@ contains
     return
   end
 
+  subroutine input_matrix_flat(prim, filename)
+    implicit none
+    character(len=20) :: filename
+    real(dp), intent(out) :: prim(NEQS,0:NX+1,0:NY+1)
+    real(dp) :: a
+    integer :: i,j
+
+    open(unit=10,file=filename)
+    do i=1, NX
+      do j=1, NY
+        read(10, *) a
+        prim(1,i,j) = HL_INIT + (HL_INIT - HR_INIT)*a
+        prim(2,i,j) = 0.d0
+        prim(3,i,j) = 0.d0
+        prim(4,i,j) = prim(1,i,j)
+        prim(5,i,j) = 0.d0
+      enddo
+    enddo
+    close(10)
+  end subroutine input_matrix_flat
+
   subroutine output_dat(x,y,prim,time)
     implicit none
     real(dp), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)

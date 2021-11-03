@@ -9,7 +9,7 @@ main=main.f90
 exefile=exe
 
 
-#mpif90 -g -Wall -pedantic -Wextra -fcheck=all -fbacktrace -o $exefile $file1 $file2 $file3 $file4 $main
+# -g -Wall -pedantic -Wextra -fcheck=all -fbacktrace
 gfortran -o $exefile $file1 $file2 $file3 $file4 $main
 rm *.mod*
 mv $exefile ../$exefile

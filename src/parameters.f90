@@ -6,7 +6,7 @@ module parameters
   integer, parameter  :: NX        = 200
   integer, parameter  :: NY        = 200
   real(dp), parameter :: LAMBDA    = 10.0d0
-  real(dp), parameter :: TFIN      = 40.0d0
+  real(dp), parameter :: TFIN      = 1.0d0
   real(dp), parameter :: CFL       = 0.5d0
   real(dp), parameter :: GG        = 9.810d0
   integer, parameter  :: ITFIN     = 100000000
@@ -23,7 +23,7 @@ module parameters
   real(dp), parameter :: UL_INIT   = 0.0d0
   real(dp), parameter :: VL_INIT   = 0.0d0
   real(dp), parameter :: ETAL_INIT = 1.8d0
-  real(dp), parameter :: WL_INIT   = 0.0d0 
+  real(dp), parameter :: WL_INIT   = 0.0d0
 
   real(dp), parameter :: HR_INIT   = 1.0d0
   real(dp), parameter :: UR_INIT   = 0.0d0
