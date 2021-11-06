@@ -3,11 +3,11 @@ module parameters
   integer, parameter  :: dp        = kind(1.0d0)
   integer, parameter  :: NEQS      = 5 ! Must be superior or equal to 5
 
-  integer, parameter  :: NX        = 200
-  integer, parameter  :: NY        = 200
-  real(dp), parameter :: LAMBDA    = 10.0d0
-  real(dp), parameter :: TFIN      = 1.0d0
-  real(dp), parameter :: CFL       = 0.5d0
+  integer, parameter  :: NX        = 500
+  integer, parameter  :: NY        = 500
+  real(dp), parameter :: LAMBDA    = 30.0d0
+  real(dp), parameter :: TFIN      = 10.0d0
+  real(dp), parameter :: CFL       = 0.9d0
   real(dp), parameter :: GG        = 9.810d0
   integer, parameter  :: ITFIN     = 100000000
 

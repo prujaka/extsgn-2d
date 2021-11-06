@@ -1,7 +1,7 @@
 import numpy as np
 from PIL import Image
 
-Nx = Ny = 200
+Nx = Ny = 500
 image = Image.open('wiki.jpg')
 image = image.resize((Nx,Ny))
 image = image.convert('L')

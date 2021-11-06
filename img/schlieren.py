@@ -318,29 +318,29 @@ renderView1 = GetActiveViewOrCreate('RenderView')
 renderView1.OrientationAxesVisibility = 0
 
 # Properties modified on renderView1.AxesGrid
-renderView1.AxesGrid.Visibility = 1
+# renderView1.AxesGrid.Visibility = 1
 
 # get the material library
 materialLibrary1 = GetMaterialLibrary()
 
-# Properties modified on renderView1.AxesGrid
-renderView1.AxesGrid.XTitle = '\n x, m'
-renderView1.AxesGrid.YTitle = 'y, m         '
-renderView1.AxesGrid.XTitleFontSize = 50
-renderView1.AxesGrid.YTitleFontSize = 50
-renderView1.AxesGrid.ZTitleFontSize = 50
-renderView1.AxesGrid.AxesToLabel = 3
-renderView1.AxesGrid.XLabelFontSize = 50
-renderView1.AxesGrid.YLabelFontSize = 50
-renderView1.AxesGrid.ZLabelFontSize = 50
-
-#renderView1.AxesGrid.XAxisUseCustomLabels = 1
-#renderView1.AxesGrid.XAxisLabels = [0, 150, 300, 450, 600]
-renderView1.AxesGrid.YAxisUseCustomLabels = 1
-renderView1.AxesGrid.YAxisLabels = [-300, -200, -100, 0, 100, 200, 300]
-
-renderView1.AxesGrid.DataPosition = [300, 300, 0]
-renderView1.AxesGrid.DataBoundsScaleFactor = 1.0
+# # Properties modified on renderView1.AxesGrid
+# renderView1.AxesGrid.XTitle = '\n x, m'
+# renderView1.AxesGrid.YTitle = 'y, m         '
+# renderView1.AxesGrid.XTitleFontSize = 50
+# renderView1.AxesGrid.YTitleFontSize = 50
+# renderView1.AxesGrid.ZTitleFontSize = 50
+# renderView1.AxesGrid.AxesToLabel = 3
+# renderView1.AxesGrid.XLabelFontSize = 50
+# renderView1.AxesGrid.YLabelFontSize = 50
+# renderView1.AxesGrid.ZLabelFontSize = 50
+#
+# #renderView1.AxesGrid.XAxisUseCustomLabels = 1
+# #renderView1.AxesGrid.XAxisLabels = [0, 150, 300, 450, 600]
+# renderView1.AxesGrid.YAxisUseCustomLabels = 1
+# renderView1.AxesGrid.YAxisLabels = [-300, -200, -100, 0, 100, 200, 300]
+#
+# renderView1.AxesGrid.DataPosition = [300, 300, 0]
+# renderView1.AxesGrid.DataBoundsScaleFactor = 1.0
 
 
 # get color transfer function/color map for 'Schlieren'
@@ -386,6 +386,15 @@ calculator1Display.RescaleTransferFunctionToDataRange(False, True)
 
 # set active source
 SetActiveSource(calculator1)
+
+# get color transfer function/color map for 'Schlieren'
+schlierenLUT = GetColorTransferFunction('Schlieren')
+
+# invert the transfer function
+schlierenLUT.InvertTransferFunction()
+
+# get opacity transfer function/opacity map for 'Schlieren'
+schlierenPWF = GetOpacityTransferFunction('Schlieren')
 
 tFinish = time.time()
 timeString = '{:.3f}'.format(tFinish - tStart)
