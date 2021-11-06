@@ -19,7 +19,6 @@ module methods
     it = 0
     time = 0.0d0
 
-    return
   end subroutine initialize_problem
 
   subroutine set_mesh(x,y)
@@ -35,7 +34,6 @@ module methods
       y(i) = YL + 0.5d0*DY + DFLOAT(i-1)*DY
     enddo
 
-    return
   end subroutine set_mesh
 
   subroutine set_ic(x,y,prim)
@@ -53,7 +51,6 @@ module methods
       case(IC_RP_SQR)
         call set_ic_rp_sqr(x,y,prim)
     end select
-    return
   end subroutine set_ic
 
   subroutine set_ic_rp_x(x,prim)
@@ -80,7 +77,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine set_ic_rp_x
   subroutine set_ic_rp_y(y,prim)
     implicit none
@@ -106,7 +102,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine set_ic_rp_y
   subroutine set_ic_rp_cyl(x,y,prim)
     implicit none
@@ -132,7 +127,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine set_ic_rp_cyl
   subroutine set_ic_rp_sqr(x,y,prim)
     implicit none
@@ -158,7 +152,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine set_ic_rp_sqr
 
   subroutine prim_to_cons(prim,cons)
@@ -172,7 +165,6 @@ module methods
       cons(k,:,:) = cons(1,:,:)*prim(k,:,:)
     enddo
 
-    return
   end subroutine prim_to_cons
 
   subroutine cons_to_prim(cons,prim)
@@ -186,7 +178,6 @@ module methods
       prim(k,:,:) = cons(k,:,:)/prim(1,:,:)
     enddo
 
-    return
   end subroutine cons_to_prim
 
   subroutine get_solution(prim,cons,it,time)
@@ -218,7 +209,6 @@ module methods
       time=time+dt
     enddo
 
-    return
   end subroutine get_solution
 
   subroutine timestep_godunov(prim,cons)
@@ -245,7 +235,6 @@ module methods
 
     deallocate(h, u, v, eta, w, F, G, S)
 
-    return
   end subroutine timestep_godunov
 
   subroutine timestep_imex(prim)
@@ -284,7 +273,6 @@ module methods
     deallocate(etastar,wstar)
     deallocate(primstar)
 
-    return
   end subroutine timestep_imex
 
   subroutine set_bc(prim)
@@ -308,7 +296,6 @@ module methods
     enddo
 
 
-    return
   end subroutine set_bc
 
   subroutine riemann_fluxes_x(prim,flux)
@@ -327,7 +314,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine riemann_fluxes_x
   subroutine riemann_fluxes_y(prim,flux)
     implicit none
@@ -354,7 +340,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine riemann_fluxes_y
 
   subroutine godunov(cons,F,G)
@@ -370,7 +355,6 @@ module methods
                                        +DX*(G(:,i,j)-G(:,i,j-1)) )
       enddo
     enddo
-    return
   end subroutine godunov
 
   subroutine split_prims_gn(prim,h,u,v,eta,w)
@@ -414,7 +398,6 @@ module methods
                 *dsin( dsqrt(LAMBDA)*dt/h(:,:) )&
                 /h(:,:) + w(:,:)*dcos( dsqrt(LAMBDA)*dt/h(:,:) )
     eta(:,:) = etanew(:,:)
-    return
   end subroutine ode_exact_solution
 
   subroutine make_sources(h,eta,w,S)
@@ -428,7 +411,6 @@ module methods
     S(4,:,:) = h(:,:)*w(:,:)
     S(5,:,:) = LAMBDA*(1.0d0 - eta(:,:)/h(:,:))
 
-    return
   end subroutine make_sources
 
   subroutine ode_euler_step(S,cons)
@@ -437,7 +419,6 @@ module methods
     real(dp), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
 
     cons(:,:,:) = cons(:,:,:) + dt * S(:,:,:)
-    return
   end subroutine ode_euler_step
 
   subroutine muscl_step_x(prim,F)
@@ -450,7 +431,6 @@ module methods
     call set_bc_muscl_x(primr,priml)
     call riemann_fluxes_muscl_x(primr,priml,F)
 
-    return
   end subroutine muscl_step_x
 
   subroutine data_reconstruction_x(prim,primr,priml)
@@ -462,7 +442,6 @@ module methods
     call get_slopes_x(prim,slope)
     primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
     priml(:,:,:) = prim(:,:,:) + 0.5d0*slope(:,:,:)
-    return
   end subroutine data_reconstruction_x
 
   subroutine get_slopes_x(prim,slope)
@@ -475,7 +454,6 @@ module methods
       slope(:,i,:) = 0.5d0*(1.0d0+OMEGA)*(prim(:,i,:) - prim(:,i-1,:))&
                    + 0.5d0*(1.0d0-OMEGA)*(prim(:,i+1,:) - prim(:,i,:))
     enddo
-    return
   end subroutine get_slopes_x
 
   subroutine set_bc_muscl_x(primr,priml)
@@ -491,7 +469,6 @@ module methods
       primr(2,NX+1,j) = BC_U_RIGHT*priml(2,NX,j)
     enddo
 
-    return
   end subroutine set_bc_muscl_x
 
   subroutine riemann_fluxes_muscl_x(primr,priml,flux)
@@ -509,7 +486,6 @@ module methods
         flux(:,i,j) = F
       enddo
     enddo
-    return
   end subroutine riemann_fluxes_muscl_x
 
   subroutine muscl_step_y(prim,F)
@@ -522,7 +498,6 @@ module methods
     call set_bc_muscl_y(primr,priml)
     call riemann_fluxes_muscl_y(primr,priml,F)
 
-    return
   end subroutine muscl_step_y
 
   subroutine data_reconstruction_y(prim,primr,priml)
@@ -534,7 +509,6 @@ module methods
     call get_slopes_y(prim,slope)
     primr(:,:,:) = prim(:,:,:) - 0.5d0*slope(:,:,:)
     priml(:,:,:) = prim(:,:,:) + 0.5d0*slope(:,:,:)
-    return
   end subroutine data_reconstruction_y
 
   subroutine get_slopes_y(prim,slope)
@@ -547,7 +521,6 @@ module methods
       slope(:,:,j) = 0.5d0*(1.0d0+OMEGA)*(prim(:,:,j) - prim(:,:,j-1))&
                    + 0.5d0*(1.0d0-OMEGA)*(prim(:,:,j+1) - prim(:,:,j))
     enddo
-    return
   end subroutine get_slopes_y
 
   subroutine set_bc_muscl_y(primr,priml)
@@ -563,7 +536,6 @@ module methods
       primr(3,i,NY+1) = BC_V_RIGHT*priml(3,i,NY)
     enddo
 
-    return
   end subroutine set_bc_muscl_y
 
   subroutine riemann_fluxes_muscl_y(primr,priml,flux)
@@ -591,7 +563,6 @@ module methods
       enddo
     enddo
 
-    return
   end subroutine riemann_fluxes_muscl_y
 
   subroutine imex_step_1(h,u,v,eta,w,hstar,ustar,vstar,etastar,wstar,F,G)
@@ -624,7 +595,6 @@ module methods
                            + DELTA*dt*LAMBDA/hstar(i,j) )
       enddo
     enddo
-    return
   end subroutine imex_step_1
 
   subroutine imex_step_2(h,u,v,eta,w,F,G,Fstar,Gstar,S)
@@ -676,7 +646,6 @@ module methods
         h(i,j) = hnew
       enddo
     enddo
-    return
   end subroutine imex_step_2
 
   subroutine hllc(priml,primr,F)
@@ -745,7 +714,6 @@ module methods
       F(:)=Fstarr(:)
     endif
 
-    return
   end subroutine hllc
 
 end module methods

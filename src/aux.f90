@@ -19,7 +19,6 @@ contains
       call cpu_time(t1)
     endif
 
-    return
   end
 
   subroutine input_matrix_flat(prim, filename)
@@ -56,7 +55,6 @@ contains
       enddo
     enddo
     close(10)
-    return
   end subroutine output_dat
 
   subroutine output_vtk(h,u,v)
@@ -113,7 +111,6 @@ end
       write(10,*) (array(i,j), i=0,NX+1)
     enddo
     close(10)
-    return
   end subroutine output_single_prim_matrix
 
   subroutine print_output_message(it,time,t1,t2)
@@ -131,7 +128,6 @@ end
     write(*,*) 'dt', dt
     write(*,*) 'cpu_time', t2-t1
     print*, ''
-    return
   end subroutine print_output_message
 
 end module aux

@@ -8,7 +8,6 @@ module model
     real(dp), intent(in) :: h, eta
 
     pressure = 0.5d0*gg*h*h - LAMBDA*eta*(eta/h-1.0d0)/3.0d0
-    return
   end
 
   real(8) function sound_speed(h, eta)
@@ -16,7 +15,6 @@ module model
     real(dp), intent(in) :: h, eta
 
     sound_speed = DSQRT(gg*h + LAMBDA*eta*eta/(h*h)/3.0d0)
-    return
   end
 
   real(8) function compute_dt(h,u,v,eta)
