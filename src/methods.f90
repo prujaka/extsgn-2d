@@ -13,8 +13,8 @@ module methods
     character(len=20) :: filename = 'img/file.txt'
 
     call set_mesh(x,y)
-    ! call set_ic(x,y,prim)
-    call input_matrix_flat(prim, filename)
+    call set_ic(x,y,prim)
+    ! call input_matrix_flat(prim, filename)
     call prim_to_cons(prim,cons)
     it = 0
     time = 0.0d0
@@ -50,8 +50,69 @@ module methods
         call set_ic_rp_cyl(x,y,prim)
       case(IC_RP_SQR)
         call set_ic_rp_sqr(x,y,prim)
+      case(IC_GENRP_SINX)
+        call set_ic_genrp_sinx(x,prim)
+      case(IC_GENRP_SINX_SINY)
+        call set_ic_genrp_sinx_siny(x,y,prim)
+
     end select
   end subroutine set_ic
+
+  subroutine set_ic_genrp_sinx(x,prim)
+    implicit none
+    real(dp), intent(in)  :: x(0:NX+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp) :: pert
+    integer :: i, j
+
+    do j=1, NY
+      do i=1, NX
+        pert = 0.1d0 * sin(x(i)*0.1d0)
+        if (x(i).le.XMID) then
+          prim(1,i,j) = HL_INIT + pert
+          prim(2,i,j) = UL_INIT
+          prim(3,i,j) = VL_INIT
+          prim(4,i,j) = ETAL_INIT + pert
+          prim(5,i,j) = WL_INIT
+        else
+          prim(1,i,j) = HR_INIT + pert
+          prim(2,i,j) = UR_INIT
+          prim(3,i,j) = VR_INIT
+          prim(4,i,j) = ETAR_INIT + pert
+          prim(5,i,j) = WR_INIT
+        endif
+      enddo
+    enddo
+
+  end subroutine set_ic_genrp_sinx
+
+  subroutine set_ic_genrp_sinx_siny(x,y,prim)
+    implicit none
+    real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
+    real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    real(dp) :: pert
+    integer :: i, j
+
+    do j=1, NY
+      do i=1, NX
+        pert = 0.1d0 * sin(x(i)*0.05d0) * sin(y(j)*0.05d0)
+        if (x(i).le.XMID) then
+          prim(1,i,j) = HL_INIT + pert
+          prim(2,i,j) = UL_INIT
+          prim(3,i,j) = VL_INIT
+          prim(4,i,j) = ETAL_INIT + pert
+          prim(5,i,j) = WL_INIT
+        else
+          prim(1,i,j) = HR_INIT + pert
+          prim(2,i,j) = UR_INIT
+          prim(3,i,j) = VR_INIT
+          prim(4,i,j) = ETAR_INIT + pert
+          prim(5,i,j) = WR_INIT
+        endif
+      enddo
+    enddo
+
+  end subroutine set_ic_genrp_sinx_siny
 
   subroutine set_ic_rp_x(x,prim)
     implicit none
