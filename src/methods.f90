@@ -40,6 +40,7 @@ module methods
     implicit none
     real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
+    character(len=20) :: filename = 'img/file.txt'
 
     select case(SELECTOR_IC)
       case(IC_RP_X)
@@ -54,6 +55,8 @@ module methods
         call set_ic_genrp_sinx(x,prim)
       case(IC_GENRP_SINX_SINY)
         call set_ic_genrp_sinx_siny(x,y,prim)
+      case(IC_MATRIX)
+        call input_matrix_flat(prim, filename)
 
     end select
   end subroutine set_ic

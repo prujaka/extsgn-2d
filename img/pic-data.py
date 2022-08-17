@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 Nx = Ny = 500
-image = Image.open('wiki.jpg')
+image = Image.open('luci.jpg')
 image = image.resize((Nx,Ny))
 image = image.convert('L')
 data = np.asarray(image)
