@@ -6,7 +6,7 @@ module parameters
   integer, parameter  :: NX        = 500
   integer, parameter  :: NY        = 500
   real(dp), parameter :: LAMBDA    = 75.0d0
-  real(dp), parameter :: TFIN      = 0.0d0
+  real(dp), parameter :: TFIN      = 40.0d0
   real(dp), parameter :: CFL       = 0.45d0
   real(dp), parameter :: GG        = 9.810d0
   integer, parameter  :: ITFIN     = 100000000
@@ -63,7 +63,7 @@ module parameters
   integer, parameter       :: IC_GENRP_SINX_SINY = 5
   integer, parameter       :: IC_MATRIX    = 6
 
-  integer, parameter       :: SELECTOR_IC = IC_MATRIX
+  integer, parameter       :: SELECTOR_IC = IC_RP_CYL
   integer, parameter       :: SELECTOR_METHOD = METHOD_IMEX
 
 end module parameters
