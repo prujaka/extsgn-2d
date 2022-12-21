@@ -32,7 +32,7 @@ abs_grad_z = np.sqrt(grad_z[0]**2 + grad_z[1]**2)
 fig, ax = plt.subplots()
 fig.set_size_inches(5, 5)
 
-ax.contourf(x, y, np.log(1 + np.log(1 + 10*abs_grad_z)), levels=100,
+ax.contourf(x, y, np.log(1 + np.log(1 + 25*abs_grad_z)), levels=100,
             cmap=plt.get_cmap('Blues'))
 
 plt.savefig('figure.png', dpi=1200)
