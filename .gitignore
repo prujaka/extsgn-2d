@@ -1,5 +1,6 @@
 .DS_Store
 **.mod
+**/*.mod
 **.eps
 **.jpg
 **.png
@@ -7,3 +8,5 @@
 **.vtk
 **.dat
 exe
+.vscode/
+.python-version

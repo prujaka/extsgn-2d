@@ -36,9 +36,8 @@ module parameters
   real(dp), parameter :: DV        = DX*DY
   real(dp), parameter :: DL        = dmin1(DX,DY)
   real(dp)            :: dt        = 1.0d-8
-  character(LEN=13)        :: DATA_FORMAT = '(9(e11.4,1x))'
+  character(LEN=13)   :: DATA_FORMAT = '(9(e11.4,1x))'
   real(dp), parameter :: PERC_FREQ = 1.0d0
-
 
   real(dp), parameter :: DELTA     = 0.2928932188134524d0
   real(dp), parameter :: OMEGA     = 0.0d0
@@ -53,17 +52,18 @@ module parameters
   character(LEN=NAMELEN), parameter :: FILE_DAT = 'res.dat'
   character(LEN=NAMELEN), parameter :: FILE_VTK = 'res.vtk'
 
-  integer, parameter       :: METHOD_GODUNOV = 0
-  integer, parameter       :: METHOD_IMEX = 1
-  integer, parameter       :: IC_RP_X     = 0
-  integer, parameter       :: IC_RP_Y     = 1
-  integer, parameter       :: IC_RP_CYL   = 2
-  integer, parameter       :: IC_RP_SQR   = 3
-  integer, parameter       :: IC_GENRP_SINX = 4
-  integer, parameter       :: IC_GENRP_SINX_SINY = 5
-  integer, parameter       :: IC_MATRIX    = 6
+  integer, parameter :: METHOD_GODUNOV     = 0
+  integer, parameter :: METHOD_IMEX        = 1
 
-  integer, parameter       :: SELECTOR_IC = IC_RP_CYL
-  integer, parameter       :: SELECTOR_METHOD = METHOD_IMEX
+  integer, parameter :: IC_RP_X            = 0
+  integer, parameter :: IC_RP_Y            = 1
+  integer, parameter :: IC_RP_CYL          = 2
+  integer, parameter :: IC_RP_SQR          = 3
+  integer, parameter :: IC_GENRP_SINX      = 4
+  integer, parameter :: IC_GENRP_SINX_SINY = 5
+  integer, parameter :: IC_MATRIX          = 6
+
+  integer, parameter :: SELECTOR_IC = IC_RP_CYL
+  integer, parameter :: SELECTOR_METHOD = METHOD_IMEX
 
 end module parameters
