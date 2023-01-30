@@ -1,13 +1,12 @@
-import matplotlib as mpl
+import random
 import matplotlib.pylab as plt
 import numpy as np
-import random
 
 
-def create_testdata(file, n_x=10, n_y=5):
+def create_testdata(file, nx=10, ny=5):
     with open(file, 'w') as f:
-        for i in range(n_x):
-            for j in range(n_y):
+        for i in range(nx):
+            for j in range(ny):
                 rand = round(random.uniform(-0.2, 0.2), 2)
                 s = ' '.join(map(str, [i, j, 1 + rand]))
                 f.write(s + '\n')
