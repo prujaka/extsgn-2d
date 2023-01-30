@@ -1,2 +1,5 @@
-# imex2d-extsgn
-2D IMEX code for Serre-Green-Naghdi equations
+# extsgn-2d
+2D code for the Extended Lagrangian Serre-Green-Naghdi equations
+
+## Requirements
+*
