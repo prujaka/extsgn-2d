@@ -8,7 +8,7 @@ module parameters
   real(dp), parameter :: GG        = 9.81d0 ! Gravity acceleration
 
   ! Time-related parameters
-  real(dp), parameter :: TFIN      = 40.0d0 ! Final time
+  real(dp), parameter :: TFIN      = 10.0d0 ! Final time
   real(dp), parameter :: CFL       = 0.45d0 ! CFL value
   integer, parameter  :: ITFIN     = 100000000 ! Max number of iterations
   real(dp)            :: dt        = 1.0d-8
@@ -60,12 +60,13 @@ module parameters
   real(dp), parameter :: BC_V_RIGHT= -1.0d0
 
   ! Output files specifications
-  integer, parameter                :: NAMELEN = 7
-  integer, parameter                :: VTK_STEP = 1
-  character(LEN=NAMELEN), parameter :: FILE_DAT = 'res.dat'
-  character(LEN=NAMELEN), parameter :: FILE_VTK = 'res.vtk'
+  integer, parameter                :: NAMELEN     = 22
+  character(LEN=NAMELEN), parameter :: FILE_DAT    = 'postprocessing/res.dat'
+  character(LEN=NAMELEN), parameter :: FILE_VTK    = 'postprocessing/res.vtk'
   character(LEN=13)                 :: DATA_FORMAT = '(9(e11.4,1x))'
-  real(dp), parameter               :: PERC_FREQ = 1.0d0
+  real(dp), parameter               :: PERC_FREQ   = 1.0d0
+  integer, parameter                :: VTK_STEP    = 1
+  integer, parameter                :: GENERATE_VTK  = 0
 
   ! Numerical method specifier constants
   integer, parameter :: METHOD_GODUNOV     = 0 ! First-order splitting
