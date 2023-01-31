@@ -1,35 +1,28 @@
 # extsgn-2d
-A second-order 2D solver for the Extended Lagrangian Serre-Green-Naghdi equations, as described in [1].
+A second-order 2D solver for the Extended Lagrangian Serre-Green-Naghdi equations, as described in https://doi.org/10.1016/j.jcp.2022.111901. Available numerical methods are the first-order splitting with the exact ODE part, and the second-order impicit-explicit ARS(2, 2, 2) method. The only available numerical flux function is the HLLC solver.
 
-Available numerical methods:
+## Getting started
+These instructions will get you a copy of the project up and running on your local machine.
 
-* First-order splitting with the exact ODE part 
-* Second-order impicit-explicit ARS(2, 2, 2) method 
+### Prerequisites
 
-The only available numerical flux function is the HLLC solver.
+I have not rigorously checked the exact minimal versions of the dependencies but everything should work already with rather old versions since there are no complex libraries used in the project. Install these dependencies with your favourite package manager on your system.
 
-## Requirements
-I have not rigorously checked the exact minimal versions of the dependencies but everything should work already with rather old versions since there are no complex libraries used in the project.
-
-Simulations:
+For simulations:
 
 * gfortran
 
-Postprocessing:
+For postprocessing:
 
 * python 3
-* gnuplot
 * matplotlib
+* Pillow (optional, for reading 2D images as initial data)
 
+### Installing
 
+Install all the requirements on your local machine and open the project with any IDE or text editor.
 
-## Setup
-
-Install all the requirements on your machine and open the project with any IDE or text editor.
-
-
-
-## Source file short description
+### Source file short description
 
 Each file in `scr/`  except `main.f90` is a module. 
 
@@ -55,7 +48,9 @@ Each file in `scr/`  except `main.f90` is a module.
 
 
 
-## Input parameters interface `parameters.f90`
+## Using the code for your simulations
+
+### Input parameters interface `parameters.f90`
 
 * Set the parameters of the model `LAMBDA` and `GG`
 
@@ -81,7 +76,7 @@ Each file in `scr/`  except `main.f90` is a module.
 
 
 
-## Run the simulations
+### Runing the simulations
 
 A simple makefile is used. All the modules are compiled together but the project is small so the building time is very short.
 
@@ -93,7 +88,7 @@ A simple makefile is used. All the modules are compiled together but the project
 
 
 
-## 1D and 2D plots
+### Postprocessing
 
 I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
@@ -132,6 +127,6 @@ I have not yet implemented the comfortable authomatic plotting, so some things s
 
 
 
-Reference:
+## Guidelines for repository contributors
 
-[1] Sergey Tkachenko, Sergey Gavrilyuk, Jacques Massoni, Extended Lagrangian approach for the numerical study of multidimensional dispersive waves: Applications to the Serre-Green-Naghdi equations, Journal of Computational Physics, Volume 477, 2023, 111901. https://doi.org/10.1016/j.jcp.2022.111901
+For the moment, I do not accept the contributions. To use the project for your goals, fork it on your local machine. If you face any problems, feel free to open an issue, and if you want to discuss anything, open a discussion in the Discussions pane.
