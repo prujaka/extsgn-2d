@@ -1,5 +1,5 @@
 # extsgn-2d
-A second-order 2D solver for the Extended Lagrangian Serre-Green-Naghdi equations, as described in https://doi.org/10.1016/j.jcp.2022.111901. Available numerical methods are the first-order splitting with the exact ODE part, and the second-order impicit-explicit ARS(2, 2, 2) method. The only available numerical flux function is the HLLC solver.
+A finite volume-based second-order 2D solver for the Extended Lagrangian Serre-Green-Naghdi equations on rectangular Cartesian mesh, as described in https://doi.org/10.1016/j.jcp.2022.111901. Available numerical methods are the first-order splitting with the exact ODE part, and the second-order impicit-explicit ARS(2, 2, 2) method. The only available numerical flux function is the HLLC solver.
 
 ## Getting started
 These instructions will get you a copy of the project up and running on your local machine.
