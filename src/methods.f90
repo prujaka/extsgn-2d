@@ -261,9 +261,9 @@ module methods
       if (dt>TFIN-time) dt = TFIN-time
 
       select case(SELECTOR_METHOD)
-        case(METHOD_GODUNOV)
-          call timestep_godunov(prim,cons)
-        case(METHOD_IMEX)
+        case(METHOD_FIRST_ORDER_SPLITTING)
+          call timestep_splitting(prim,cons)
+        case(METHOD_IMEX_ARS_222)
           call timestep_imex(prim)
       end select
 
@@ -275,7 +275,7 @@ module methods
 
   end subroutine get_solution
 
-  subroutine timestep_godunov(prim,cons)
+  subroutine timestep_splitting(prim,cons)
     implicit none
     real(dp), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
@@ -299,7 +299,7 @@ module methods
 
     deallocate(h, u, v, eta, w, F, G, S)
 
-  end subroutine timestep_godunov
+  end subroutine timestep_splitting
 
   subroutine timestep_imex(prim)
     implicit none

@@ -8,10 +8,10 @@ module parameters
   real(dp), parameter :: GG        = 9.81d0 ! Gravity acceleration
 
   ! Time-related parameters
-  real(dp), parameter :: TFIN      = 10.0d0 ! Final time
+  real(dp), parameter :: TFIN      = 0.0d0 ! Final time
   real(dp), parameter :: CFL       = 0.45d0 ! CFL value
   integer, parameter  :: ITFIN     = 100000000 ! Max number of iterations
-  real(dp)            :: dt        = 1.0d-8
+  real(dp)            :: dt        = 1.0d-8 ! initial dt
 
   ! Computational domain parameters: number of cells, and domain boudaries
   integer, parameter  :: NX        = 500
@@ -26,9 +26,7 @@ module parameters
   real(dp), parameter :: DV        = DX*DY
   real(dp), parameter :: DL        = dmin1(DX,DY)
 
-  ! Cylinder radius for the 2D cylindric Riemann problem (RP):
-  !   initial x and y positions and the cylinder radius for 2D cylindrical RP
-  ! RADIUS is Also used as the HALF square side for the square 2D RP
+  ! Cylinder radius for the 2D cylindric Riemann problem (RP)
   real(dp), parameter :: XMID      = 0.0d0
   real(dp), parameter :: YMID      = 0.0d0
   real(dp), parameter :: RADIUS    = 40.0d0
@@ -52,8 +50,7 @@ module parameters
   real(dp), parameter :: DELTA     = 0.2928932188134524d0
   real(dp), parameter :: OMEGA     = 0.0d0
 
-  ! Boundary condition coefficients of the velocities in the ghost cells.
-  ! 1.0 corresponds to the transparent BC, and -1.0 corresponds to the Wall BC
+  ! Boundary conditions velocity coefficients
   real(dp), parameter :: BC_U_LEFT = -1.0d0
   real(dp), parameter :: BC_U_RIGHT= -1.0d0
   real(dp), parameter :: BC_V_LEFT = -1.0d0
@@ -69,8 +66,8 @@ module parameters
   integer, parameter                :: GENERATE_VTK  = 0
 
   ! Numerical method specifier constants
-  integer, parameter :: METHOD_GODUNOV     = 0 ! First-order splitting
-  integer, parameter :: METHOD_IMEX        = 1 ! Second-order IMEX ARS(2, 2, 2)
+  integer, parameter :: METHOD_FIRST_ORDER_SPLITTING = 0
+  integer, parameter :: METHOD_IMEX_ARS_222          = 1
 
   ! Initial condition specifier constants
   integer, parameter :: IC_RP_X            = 0
@@ -83,6 +80,6 @@ module parameters
 
   ! Initial condition and Numerical method specifier flags
   integer, parameter :: SELECTOR_IC = IC_RP_CYL
-  integer, parameter :: SELECTOR_METHOD = METHOD_IMEX
+  integer, parameter :: SELECTOR_METHOD = METHOD_IMEX_ARS_222
 
 end module parameters
