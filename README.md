@@ -20,7 +20,7 @@ For postprocessing:
 
 ### Installing
 
-Install all the requirements on your local machine and open the project with any IDE or text editor.
+Fork/clone the repository, install all the requirements on your local machine, and open the project with any IDE or text editor.
 
 ### Source file short description
 
