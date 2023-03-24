@@ -80,10 +80,8 @@ Each file in `scr/`  except `main.f90` is a module.
 
 A simple makefile is used. All the modules are compiled together but the project is small so the building time is very short.
 
-* `make compile` to compile the project with the optimization flags for faster computations. For the moment, after the compilation, the `.mod` files will appear directly in the root directory. I will soon fix this behaviour to keep the project tree neat.
+* `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
-* `make debug` for debugging with debug flags
-* `make makerun` is a sequence of `make compile` and `make run`
 * `make clean` to remove all the `.mod` and bin files. 
 
 
