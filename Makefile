@@ -1,33 +1,54 @@
-MOD1=parameters.f90
-MOD2=aux.f90
-MOD3=model.f90
-MOD4=methods.f90
-MAIN=main.f90
-SRC_DIR=src
+TARGET_NAME = extsgn
+BUILD_DIR   = build
+SRC_DIR     = src
 
-FCOMP = gfortran
-OBJ = $(SRC_DIR)/$(MOD1) $(SRC_DIR)/$(MOD2) $(SRC_DIR)/$(MOD3) $(SRC_DIR)/$(MOD4) $(SRC_DIR)/$(MAIN)
-EXEC = exe
+MKDIR_P ?= mkdir -p
 
-FFLAGS_DEBUG = -g -g0 -fimplicit-none -fcheck=all -fbacktrace
-FFLAGS_OPT = -O3
+SRCS := $(wildcard $(SRC_DIR)/*.f90)
+OBJS := $(SRCS:$(SRC_DIR)/%.f90=$(BUILD_DIR)/%.o)
 
-.PHONY: compile
-compile:
-	@$(FCOMP) $(FFLAGS_OPT) -o $(EXEC) $(OBJ)
+FC      = gfortran
+FCFLAGS = -g -O2 -J $(BUILD_DIR)
+LDFLAGS =
 
-.PHONY: debug
-debug:
-	@$(FCOMP) $(FFLAGS_DEBUG) -o $(EXEC) $(OBJ)
+$(BUILD_DIR)/$(TARGET_NAME): $(OBJS)
+	$(FC) $(OBJS) -o $@ $(LDFLAGS)
 
-.PHONY: run
-run:
-	@./$(EXEC)
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.f90 $(BUILD_DIR)/%.mod
+	@$(MKDIR_P) $(dir $@)
+	$(FC) $(FCFLAGS) -c $< -o $@
 
-.PHONY: makerun
-makerun: compile run
+$(BUILD_DIR)/%.mod: $(SRC_DIR)/%.f90
+	@$(MKDIR_P) $(dir $@)
+	$(FC) $(FCFLAGS) -c $< -o $(BUILD_DIR)/$*.o
+
+$(BUILD_DIR)/aux.mod: $(BUILD_DIR)/parameters.mod
+$(BUILD_DIR)/main.mod: $(BUILD_DIR)/aux.mod $(BUILD_DIR)/parameters.mod \
+	$(BUILD_DIR)/methods.mod
+$(BUILD_DIR)/model.mod: $(BUILD_DIR)/parameters.mod
+$(BUILD_DIR)/methods.mod: $(BUILD_DIR)/parameters.mod $(BUILD_DIR)/model.mod \
+	$(BUILD_DIR)/aux.mod
+
+$(BUILD_DIR)/aux.o: $(BUILD_DIR)/parameters.mod
+$(BUILD_DIR)/main.o: $(BUILD_DIR)/aux.mod $(BUILD_DIR)/parameters.mod \
+	$(BUILD_DIR)/methods.mod
+$(BUILD_DIR)/model.o: $(BUILD_DIR)/parameters.mod
+$(BUILD_DIR)/methods.o: $(BUILD_DIR)/parameters.mod $(BUILD_DIR)/model.mod \
+	$(BUILD_DIR)/aux.mod
+
+.PHONY: all
+all: $(BUILD_DIR)/$(TARGET_NAME)
 
 .PHONY: clean
 clean:
-	@rm exe
-	@rm *mod*
+	$(RM) -r $(BUILD_DIR)
+	$(RM) $(SRC_DIR)/*.mod
+
+.PHONY: run
+run: $(BUILD_DIR)/$(TARGET_NAME)
+	cd $(BUILD_DIR); ./$(TARGET_NAME)
+
+.PHONY: debug
+debug:
+	@echo SRCS = $(SRCS)
+	@echo OBJS = $(OBJS)
