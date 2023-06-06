@@ -34,5 +34,5 @@ fig.set_size_inches(5, 5)
 ax.contourf(x, y, np.log(1 + np.log(1 + 25*abs_grad_z)), levels=100,
             cmap=plt.get_cmap('Blues'))
 
-plt.savefig('schlieren-2d.png', dpi=1200)
+plt.savefig('postprocessing/schlieren-2d.png', dpi=1200)
 plt.close()
