@@ -103,7 +103,7 @@ I have not yet implemented the comfortable authomatic plotting, so some things s
     ```
 * Make sure that in your terminal, you are in the main directory of the repo so that you could use the Makefile.
 
-* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, execute the `contourplot.py` script with python:
+* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, use the following make command:
 
     ```shell
     make contour_plot
