@@ -14,9 +14,9 @@ def create_testdata(file, nx=10, ny=5):
 
 # create_testdata('data.dat')
 
-n_x = 500
-n_y = 500
-with open('res.dat') as f:
+n_x = 800
+n_y = 800
+with open('out/res.dat') as f:
     lines = [line.strip() for line in f.readlines()]
     x = np.array([float(line.split()[0]) for line in lines])
     y = np.array([float(line.split()[1]) for line in lines])
@@ -35,4 +35,4 @@ ax.contourf(x, y, np.log(1 + np.log(1 + 25*abs_grad_z)), levels=100,
             cmap=plt.get_cmap('Blues'))
 
 plt.savefig('schlieren-2d.png', dpi=1200)
-plt.show()
+plt.close()
