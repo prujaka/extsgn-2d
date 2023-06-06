@@ -52,3 +52,11 @@ run: $(BUILD_DIR)/$(TARGET_NAME)
 debug:
 	@echo SRCS = $(SRCS)
 	@echo OBJS = $(OBJS)
+
+.PHONY: contour_plot
+contour_plot:
+	@python postprocessing/contourplot.py
+
+.PHONY: plot
+plot:
+	@python postprocessing/plot.py

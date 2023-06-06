@@ -83,45 +83,42 @@ A simple makefile is used. All the modules are compiled together but the project
 * `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
 * `make clean` to remove all the `.mod` and bin files. 
+* `make contour_plot` to plot a full 2D contour plot
+* `make plot` to plot a horizontal 1D cross-section of the solution.
 
 
 
 ### Postprocessing
 
+There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
 I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
-* Go to the `postprocessing/` directory:
+* Specify the number of cells you used in the `parameters.f90` module inside the script `postprocessing/plot.py` or `postprocessing/contourplot.py`, depending on which type of plot you wish to draw.
+
+    Example: 
+
+    ```python
+    n_x = 500
+    n_y = 500
+    ```
+* Make sure that in your terminal, you are in the main directory of the repo so that you could use the Makefile.
+
+* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, execute the `contourplot.py` script with python:
 
     ```shell
-    cd postprocessing
+    make contour_plot
     ```
 
-* To draw a full 2D contourplot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, execute the `contourplot.py` script with python:
+  The image file will be saved as `schlieren-2d.png` in the `postprocessing/` directory.
 
-    ```shell
-    python contourplot.py
-    ```
-
-    * You will see the pop-up matplotlib window which will also be saved as `schlieren-2d.png` in the `postprocessing/` directory.
 
 * To draw a 1D cross-section of the 2D data along the x axis:
 
-    * Specify the number of cells you used in the `parameters.f90` module inside the `plot.py` script. I will soon add the authomatic reading funtionality, but for the moment let's do it manually.
+    ```shell
+    make plot
+    ```
 
-        Example: 
-
-        ```python
-        n_x = 500
-        n_y = 500
-        ```
-
-    * Execute the `plot.py` script:
-
-        ```py
-        python plot.py
-        ```
-
-    * You will see the pop-up matplotlib window which will also be saved as `huvetaw-1d.png` in the `postprocessing/` directory. You can disable the pop-up matplotlib figure by commenting 
+  The image file will be saved as `huvetaw-1d.png` in the `postprocessing/` directory. 
 
 
 

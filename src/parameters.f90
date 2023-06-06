@@ -8,14 +8,14 @@ module parameters
   real(dp), parameter :: GG        = 9.81d0 ! Gravity acceleration
 
   ! Time-related parameters
-  real(dp), parameter :: TFIN      = 1.0d0 ! Final time
-  real(dp), parameter :: CFL       = 0.45d0 ! CFL value
+  real(dp), parameter :: TFIN      = 40.0d0 ! Final time
+  real(dp), parameter :: CFL       = 0.5d0 ! CFL value
   integer, parameter  :: ITFIN     = 100000000 ! Max number of iterations
   real(dp)            :: dt        = 1.0d-8 ! initial dt
 
   ! Computational domain parameters: number of cells, and domain boudaries
-  integer, parameter  :: NX        = 500
-  integer, parameter  :: NY        = 500
+  integer, parameter  :: NX        = 800
+  integer, parameter  :: NY        = 800
   real(dp), parameter :: XL        = -300.0d0
   real(dp), parameter :: XR        = 300.0d0
   real(dp), parameter :: YL        = -300.0d0

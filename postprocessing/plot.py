@@ -2,10 +2,10 @@ import matplotlib.pylab as plt
 import numpy as np
 
 
-n_x = 500
-n_y = 500
+n_x = 800
+n_y = 800
 
-with open('res.dat') as f:
+with open('out/res.dat') as f:
     lines = [line.strip() for line in f.readlines()]
     x = np.array([float(line.split()[0]) for line in lines])
     y = np.array([float(line.split()[1]) for line in lines])
@@ -49,5 +49,5 @@ for i in range(3):
         axs[i, j].legend()
         axs[i, j].grid()
 
-plt.savefig('huvetaw-1d.png', dpi=600)
-plt.show()
+plt.savefig('postprocessing/huvetaw-1d.png', dpi=600)
+plt.close()
