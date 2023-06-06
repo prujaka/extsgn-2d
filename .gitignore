@@ -2,6 +2,7 @@
 
 .vscode/
 .python-version
+.idea/
 **/__pychache__
 build/
 
