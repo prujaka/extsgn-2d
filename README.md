@@ -91,7 +91,7 @@ A simple makefile is used. All the modules are compiled together but the project
 There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
 I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
-* Specify the number of cells you used in the `parameters.f90` module inside the script `plot.py` or `contourplot.py`, depending on which type of plot you wish to draw.
+* Specify the number of cells you used in the `parameters.f90` module inside the script `postprocessing/plot.py` or `postprocessing/contourplot.py`, depending on which type of plot you wish to draw.
 
     Example: 
 
@@ -99,6 +99,7 @@ I have not yet implemented the comfortable authomatic plotting, so some things s
     n_x = 500
     n_y = 500
     ```
+* Make sure that in your terminal, you are in the main directory of the repo so that you could use the Makefile.
 
 * To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, execute the `contourplot.py` script with python:
 
