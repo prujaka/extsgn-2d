@@ -83,6 +83,8 @@ A simple makefile is used. All the modules are compiled together but the project
 * `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
 * `make clean` to remove all the `.mod` and bin files. 
+* `make contour_plot` to plot a full 2D contour plot
+* `make plot` to plot a horizontal 1D cross-section of the solution.
 
 
 
