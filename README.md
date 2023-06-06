@@ -88,40 +88,34 @@ A simple makefile is used. All the modules are compiled together but the project
 
 ### Postprocessing
 
+There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
 I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
-* Go to the `postprocessing/` directory:
+* Specify the number of cells you used in the `parameters.f90` module inside the script `plot.py` or `contourplot.py`, depending on which type of plot you wish to draw.
 
-    ```shell
-    cd postprocessing
+    Example: 
+
+    ```python
+    n_x = 500
+    n_y = 500
     ```
 
-* To draw a full 2D contourplot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, execute the `contourplot.py` script with python:
+* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, execute the `contourplot.py` script with python:
 
     ```shell
-    python contourplot.py
+    make contour_plot
     ```
 
-    * You will see the pop-up matplotlib window which will also be saved as `schlieren-2d.png` in the `postprocessing/` directory.
+  The image file will be saved as `schlieren-2d.png` in the `postprocessing/` directory.
+
 
 * To draw a 1D cross-section of the 2D data along the x axis:
 
-    * Specify the number of cells you used in the `parameters.f90` module inside the `plot.py` script. I will soon add the authomatic reading funtionality, but for the moment let's do it manually.
+    ```shell
+    make plot
+    ```
 
-        Example: 
-
-        ```python
-        n_x = 500
-        n_y = 500
-        ```
-
-    * Execute the `plot.py` script:
-
-        ```py
-        python plot.py
-        ```
-
-    * You will see the pop-up matplotlib window which will also be saved as `huvetaw-1d.png` in the `postprocessing/` directory. You can disable the pop-up matplotlib figure by commenting 
+  The image file will be saved as `huvetaw-1d.png` in the `postprocessing/` directory. 
 
 
 
