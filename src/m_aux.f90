@@ -3,23 +3,38 @@ use m_parameters
 implicit none
 contains
 
-  subroutine print_percentage(time,t1,milestone)
+  subroutine print_percentage(time, t1, milestone, it)
     implicit none
-    real(dp), intent(in) :: time
-    real(dp), intent(inout) :: t1
-    real(dp) :: milestone
-    real(dp) :: t2, percentage
+    real(DP), intent(in) :: time
+    real(DP), intent(inout) :: t1, milestone
+    integer, intent(in) :: it
+    real(DP) :: eta, t2, percentage
+    real(DP) :: s
+    integer :: h, m
+    character(len=100) :: fmt
 
-    percentage = time*100.0d0/TFIN
-    if (percentage > milestone) then
+    fmt = '((A, I3, A), (A, I8, A), (A, F12.8, A), (F7.2, A), A, 3(I2.2, A))'
+    percentage = time / TFIN * 100.0_dp
+
+    if (percentage >= milestone) then
       call cpu_time(t2)
-      write(*,'(I4,A,(F8.1),A)') NINT(percentage), ' % completed ', t2-t1, &
-        ' sec'
-      milestone = milestone + PERC_FREQ
+
+      eta = (t2-t1) * float(100 - NINT(percentage))
+
+      h = int(eta) / 3600
+      m = int((eta - float(h) * 3600.0)) / 60
+      s = mod(eta - float(h) * 3600.0, 60.0)
+
+      write(*, fmt) &
+      '| ', NINT(percentage), ' % | ', &
+      'it ', it, ' | ', &
+      'dt ', dt, ' | ', &
+       t2-t1, ' sec | ', &
+      'ETA  ', h, ':', m, ':', int(s), ' |'
+      milestone = milestone + perc_freq
       call cpu_time(t1)
     endif
-
-  end
+  end subroutine print_percentage
 
   subroutine input_matrix_flat(prim, filename)
     implicit none
