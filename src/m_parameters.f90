@@ -1,19 +1,19 @@
-module parameters
+module m_parameters
   implicit none
   integer, parameter  :: dp        = kind(1.0d0)
   integer, parameter  :: NEQS      = 5 ! Number of equations
 
-  ! Physical parameters of the model
+  ! Physical m_parameters of the model
   real(dp), parameter :: LAMBDA    = 75.0d0 ! Penalization parameter value
   real(dp), parameter :: GG        = 9.81d0 ! Gravity acceleration
 
-  ! Time-related parameters
+  ! Time-related m_parameters
   real(dp), parameter :: TFIN      = 40.0d0 ! Final time
   real(dp), parameter :: CFL       = 0.5d0 ! CFL value
   integer, parameter  :: ITFIN     = 100000000 ! Max number of iterations
   real(dp)            :: dt        = 1.0d-8 ! initial dt
 
-  ! Computational domain parameters: number of cells, and domain boudaries
+  ! Computational domain m_parameters: number of cells, and domain boudaries
   integer, parameter  :: NX        = 800
   integer, parameter  :: NY        = 800
   real(dp), parameter :: XL        = -300.0d0
@@ -82,4 +82,4 @@ module parameters
   integer, parameter :: SELECTOR_IC = IC_RP_CYL
   integer, parameter :: SELECTOR_METHOD = METHOD_IMEX_ARS_222
 
-end module parameters
+end module m_parameters

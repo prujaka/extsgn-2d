@@ -1,8 +1,8 @@
 program extsgn_imex2d
-  use parameters
-  use aux
-  use methods
-  use model
+  use m_parameters
+  use m_aux
+  use m_methods
+  use m_model
   implicit none
   integer :: it
   real :: t1,t2

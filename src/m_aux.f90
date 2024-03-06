@@ -1,5 +1,5 @@
-module aux
-use parameters
+module m_aux
+use m_parameters
 implicit none
 contains
 
@@ -130,4 +130,4 @@ end
     print*, ''
   end subroutine print_output_message
 
-end module aux
+end module m_aux

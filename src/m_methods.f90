@@ -1,7 +1,7 @@
-module methods
-  use parameters
-  use model
-  use aux
+module m_methods
+  use m_parameters
+  use m_model
+  use m_aux
   implicit none
   contains
 
@@ -750,7 +750,7 @@ module methods
 
     ! Smid
     ! Massoni, J. (1999). Un Modèle Micromécanique pour l'Initiation par
-    ! Choc et la Transition vers la Détonation dans les Matériaux Solides
+    ! Choc et la Transition vers la Détonation dans les Matérim_aux Solides
     ! Hautement Energétiques (Thèse).
     smid = (sr*Fr(1)-sl*Fl(1)+Fl(2)-Fr(2))/(sr*rhor-sl*rhol+Fl(1)-Fr(1))
 
@@ -780,4 +780,4 @@ module methods
 
   end subroutine hllc
 
-end module methods
+end module m_methods

@@ -1,5 +1,5 @@
-module model
-  use parameters
+module m_model
+  use m_parameters
   implicit none
   contains
 
@@ -34,4 +34,4 @@ module model
 
   end
 
-end module model
+end module m_model
