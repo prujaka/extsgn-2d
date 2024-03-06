@@ -78,7 +78,7 @@ Each file in `scr/`  except `main.f90` is a module.
 
 ### Runing the simulations
 
-A simple makefile is used. All the modules are compiled together but the project is small so the building time is very short.
+A simple makefile is used:
 
 * `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
