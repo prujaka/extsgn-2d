@@ -24,12 +24,11 @@ $(BLD_DIR)/$(EXEC): $(OBJS)
 	$(FC) $(FCFLAGS) -o $@ $(OBJS)
 
 # Dependencies
-$(BLD_DIR)/main.o : $(MOD_OBJS)
-$(BLD_DIR)/m_init.o $(BLD_DIR)/m_aux.o $(BLD_DIR)/m_dt_god.o \
-	$(BLD_DIR)/m_dt_ode.o $(BLD_DIR)/m_dt_imex.o $(BLD_DIR)/m_model.o: \
-	$(BLD_DIR)/m_defs.o
-$(BLD_DIR)/m_dt_god.o $(BLD_DIR)/m_dt_imex.o $(BLD_DIR)/m_dt_ode.o: \
-	$(BLD_DIR)/m_model.o
+# $(BLD_DIR)/main.o : $(MOD_OBJS)
+$(BLD_DIR)/main.o: $(BLD_DIR)/aux.o $(BLD_DIR)/methods.o $(BLD_DIR)/model.o $(BLD_DIR)/parameters.o
+$(BLD_DIR)/aux.o $(BLD_DIR)/methods.o $(BLD_DIR)/model.o: $(BLD_DIR)/parameters.o
+$(BLD_DIR)/methods.o: $(BLD_DIR)/model.o $(BLD_DIR)/aux.o
+
 
 run: $(BLD_DIR)/$(EXEC)
 	$(BLD_DIR)/$(EXEC)
@@ -47,4 +46,4 @@ debug:
 	@echo "EXEC = $(EXEC)"
 
 plot:
-	@python plot/plot.py
+	@python postprocessing/plot.py
