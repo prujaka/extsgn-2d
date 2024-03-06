@@ -72,6 +72,36 @@ contains
     close(10)
   end subroutine output_dat
 
+  subroutine output_dat_checkpoint(x,y,prim,time)
+    implicit none
+    real(dp), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)
+    real(dp), intent(in) :: time
+    real(dp) :: milestone
+    real(dp) :: percentage
+    character(len=30) :: filename
+    integer :: i,k,j
+
+    percentage = time / TFIN * 100.0d0
+    if (percentage >= milestone) then
+      if(time<10.0d0) then
+        write(filename,'(A,f7.5,A)') 'out/res_t=0', time, '.dat'
+      else
+        write(filename,'(A,F8.5,A)') 'out/res_t=', time, '.dat'
+      endif
+      milestone = milestone + PERC_FREQ
+
+      open(unit=10,file=filename)
+      do i=1, NX
+        do j=1, NY
+          write(10,FMT=DATA_FORMAT) x(i), y(j), (prim(k,i,j), k=1,NEQS), time
+        enddo
+      enddo
+      close(10)
+
+    endif
+
+  end subroutine output_dat_checkpoint
+
   subroutine output_vtk(h,u,v)
   implicit none
   real(dp), dimension(0:NX+1,0:NY+1), intent(in) :: h,u,v!,eta,w,p
