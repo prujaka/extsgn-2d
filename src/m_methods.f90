@@ -267,7 +267,7 @@ module m_methods
           call timestep_imex(prim)
       end select
 
-      call print_percentage(time,t1,milestone)
+      call print_percentage(time,t1,milestone,it)
 
       it=it+1
       time=time+dt
