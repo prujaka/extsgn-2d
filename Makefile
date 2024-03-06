@@ -47,3 +47,9 @@ debug:
 
 plot:
 	@python postprocessing/plot.py
+
+contour_plot:
+	@python postprocessing/contourplot.py
+
+plot:
+	@python postprocessing/plot.py
