@@ -24,8 +24,7 @@ $(BLD_DIR)/$(EXEC): $(OBJS)
 	$(FC) $(FCFLAGS) -o $@ $(OBJS)
 
 # Dependencies
-# $(BLD_DIR)/main.o : $(MOD_OBJS)
-$(BLD_DIR)/main.o: $(BLD_DIR)/m_aux.o $(BLD_DIR)/m_methods.o $(BLD_DIR)/m_model.o $(BLD_DIR)/m_parameters.o
+$(BLD_DIR)/main.o : $(MOD_OBJS)
 $(BLD_DIR)/m_aux.o $(BLD_DIR)/m_methods.o $(BLD_DIR)/m_model.o: $(BLD_DIR)/m_parameters.o
 $(BLD_DIR)/m_methods.o: $(BLD_DIR)/m_model.o $(BLD_DIR)/m_aux.o
 
@@ -44,9 +43,6 @@ debug:
 	@echo "MODS = $(MODS)"
 	@echo "MOD_OBJS = $(MOD_OBJS)"
 	@echo "EXEC = $(EXEC)"
-
-plot:
-	@python postprocessing/plot.py
 
 contour_plot:
 	@python postprocessing/contourplot.py
