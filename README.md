@@ -24,19 +24,19 @@ Fork/clone the repository, install all the requirements on your local machine, a
 
 ### Source file short description
 
-Each file in `scr/`  except `main.f90` is a module. 
+Each file in `scr/`  except `main.f90` is a module.
 
 > `src/`
 >
-> > `aux.f90`  contains procedures for data outputs 
+> > `m_aux.f90`  contains procedures for data outputs
 > >
-> > `main.f90`  main program, only calls procedures implemented in `methods.f90` and `aux.f90`
+> > `main.f90`  main program, only calls procedures implemented in `m_methods.f90` and `m_aux.f90`
 > >
-> > `methods.f90` a major module containing all the initial & boundary conditions, and numerical methods
+> > `m_methods.f90` a major module containing all the initial & boundary conditions, and numerical methods
 > >
-> > `model.f90` contains model-specific functions: pressure, sound speed and time step
+> > `m_model.f90` contains model-specific functions: pressure, sound speed and time step
 > >
-> > `parameters.f90` the input parameters module, the main interface for a user.
+> > `m_parameters.f90` the input parameters module, the main interface for a user.
 >
 > `img/`
 >
@@ -50,7 +50,7 @@ Each file in `scr/`  except `main.f90` is a module.
 
 ## Using the code for your simulations
 
-### Input parameters interface `parameters.f90`
+### Input parameters interface `m_parameters.f90`
 
 * Set the parameters of the model `LAMBDA` and `GG`
 
@@ -58,7 +58,7 @@ Each file in `scr/`  except `main.f90` is a module.
 
 * Set mesh parameters
 
-    * Number of cells in x and y directions `NX` and `NY` 
+    * Number of cells in x and y directions `NX` and `NY`
 
     * Domain size `XL`, `XR`, `YL`, `YR`
 
@@ -82,7 +82,7 @@ A simple makefile is used. All the modules are compiled together but the project
 
 * `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
-* `make clean` to remove all the `.mod` and bin files. 
+* `make clean` to remove all the `.mod` and bin files.
 * `make contour_plot` to plot a full 2D contour plot
 * `make plot` to plot a horizontal 1D cross-section of the solution.
 
@@ -93,9 +93,9 @@ A simple makefile is used. All the modules are compiled together but the project
 There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
 I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
-* Specify the number of cells you used in the `parameters.f90` module inside the script `postprocessing/plot.py` or `postprocessing/contourplot.py`, depending on which type of plot you wish to draw.
+* Specify the number of cells you used in the `m_parameters.f90` module inside the script `postprocessing/plot.py` or `postprocessing/contourplot.py`, depending on which type of plot you wish to draw.
 
-    Example: 
+    Example:
 
     ```python
     n_x = 500
@@ -118,7 +118,7 @@ I have not yet implemented the comfortable authomatic plotting, so some things s
     make plot
     ```
 
-  The image file will be saved as `huvetaw-1d.png` in the `postprocessing/` directory. 
+  The image file will be saved as `huvetaw-1d.png` in the `postprocessing/` directory.
 
 
 
