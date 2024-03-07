@@ -61,9 +61,47 @@ class Solution:
         plt.savefig(file, dpi=1200)
         plt.close()
 
+    def plot_sections(self, file):
+        fig, axs = plt.subplots(3, 2, figsize=(10, 10))
+
+        x = self.section_x
+        h = self.section_h
+        u = self.section_u
+        v = self.section_v
+        eta = self.section_eta
+        w = self.section_w
+
+        axs[0, 0].plot(x, h, label='Depth h')
+        axs[0, 0].set_ylabel('m')
+
+        axs[0, 1].plot(x, u, label='Horizontal velocity u')
+        axs[0, 1].set_ylabel('m/s')
+
+        axs[1, 0].plot(x, v, label='Vertical velocity u')
+        axs[1, 0].set_ylabel('m/s')
+
+        axs[1, 1].plot(x, eta, label='eta')
+        axs[1, 1].set_ylabel('m')
+
+        axs[2, 0].plot(x, w, label='w')
+        axs[2, 0].set_ylabel('m/s')
+
+        for i in range(3):
+            for j in range(2):
+                if i == 2 and j != 0:
+                    break
+                axs[i, j].set_xlabel('x (m)')
+                axs[i, j].legend()
+                axs[i, j].grid()
+
+        plt.savefig(file, dpi=600)
+        plt.close()
+
 
 if __name__ == '__main__':
     file = '../out/res.dat'
     png = '../img/schlieren-2d.png'
+    png_1d = '../img/huvetaw-1d.png'
     solution = Solution(file)
     solution.plot_schlieren(png)
+    solution.plot_sections(png_1d)
