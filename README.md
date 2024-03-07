@@ -73,6 +73,7 @@ Each file in `scr/`  except `main.f90` is a module.
 * Select numerical method flag `SELECTOR_METHOD`. Available options:
     * First-order splitting `METHOD_FIRST_ORDER_SPLITTING`
     * Second-order IMEX ARS(2, 2, 2) `METHOD_IMEX_ARS_222`
+* Choose whether you want to produce intermediate output files by setting `SELECTOR_PERC_OUTPUT` to `PERC_OUTPUT_ON` or to `PERC_OUTPUT_OFF` otherwise. The `PERC_FREQ`  is the percentage controlling their number: for instance, `PERC_FREQ = 1.0d0` would correspond to 100 output files.
 
 
 
