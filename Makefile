@@ -45,10 +45,10 @@ debug:
 	@echo "EXEC = $(EXEC)"
 
 contour_plot:
-	@python postprocessing/contourplot.py
+	@python plot/contourplot.py
 
 plot:
-	@python postprocessing/plot.py
+	@python plot/plot.py
 
 rm_seq:
 	@rm out/*_t=*.dat
