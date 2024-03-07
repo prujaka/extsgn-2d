@@ -244,8 +244,9 @@ module m_methods
 
   end subroutine cons_to_prim
 
-  subroutine get_solution(prim,cons,it,time)
+  subroutine get_solution(x,y,prim,cons,it,time)
     implicit none
+    real(dp), intent(inout) :: x(0:NX+1),y(0:NY+1)
     real(dp), intent(inout) :: cons(NEQS,0:NX+1,0:NY+1)
     real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer, intent(inout) :: it
@@ -268,9 +269,16 @@ module m_methods
       end select
 
       call print_percentage(time,t1,milestone,it)
+      if (SELECTOR_PERC_OUTPUT == PERC_OUTPUT_ON) then
+        call output_dat_checkpoint(x,y,prim,time)
+      endif
 
       it=it+1
       time=time+dt
+
+      if (SELECTOR_PERC_OUTPUT == PERC_OUTPUT_ON) then
+        call output_dat_checkpoint(x,y,prim,time)
+      endif
     enddo
 
   end subroutine get_solution

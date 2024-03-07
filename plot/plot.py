@@ -49,5 +49,5 @@ for i in range(3):
         axs[i, j].legend()
         axs[i, j].grid()
 
-plt.savefig('postprocessing/huvetaw-1d.png', dpi=600)
+plt.savefig('plot/huvetaw-1d.png', dpi=600)
 plt.close()

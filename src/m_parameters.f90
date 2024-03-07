@@ -14,8 +14,8 @@ module m_parameters
   real(dp)            :: dt        = 1.0d-8 ! initial dt
 
   ! Computational domain m_parameters: number of cells, and domain boudaries
-  integer, parameter  :: NX        = 800
-  integer, parameter  :: NY        = 800
+  integer, parameter  :: NX        = 100
+  integer, parameter  :: NY        = 100
   real(dp), parameter :: XL        = -300.0d0
   real(dp), parameter :: XR        = 300.0d0
   real(dp), parameter :: YL        = -300.0d0
@@ -58,8 +58,8 @@ module m_parameters
 
   ! Output files specifications
   integer, parameter                :: NAMELEN     = 22
-  character(LEN=NAMELEN), parameter :: FILE_DAT    = '../out/res.dat'
-  character(LEN=NAMELEN), parameter :: FILE_VTK    = '../out/res.vtk'
+  character(LEN=NAMELEN), parameter :: FILE_DAT    = 'out/res.dat'
+  character(LEN=NAMELEN), parameter :: FILE_VTK    = 'out/res.vtk'
   character(LEN=13)                 :: DATA_FORMAT = '(9(e11.4,1x))'
   real(dp), parameter               :: PERC_FREQ   = 1.0d0
   integer, parameter                :: VTK_STEP    = 1
@@ -78,8 +78,14 @@ module m_parameters
   integer, parameter :: IC_GENRP_SINX_SINY = 5
   integer, parameter :: IC_MATRIX          = 6
 
+  ! Percentage output enumerator
+  enum, bind(c)
+    enumerator :: PERC_OUTPUT_OFF, PERC_OUTPUT_ON
+  end enum
+
   ! Initial condition and Numerical method specifier flags
   integer, parameter :: SELECTOR_IC = IC_RP_CYL
   integer, parameter :: SELECTOR_METHOD = METHOD_IMEX_ARS_222
+  integer, parameter :: SELECTOR_PERC_OUTPUT = PERC_OUTPUT_ON
 
 end module m_parameters

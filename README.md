@@ -73,6 +73,7 @@ Each file in `scr/`  except `main.f90` is a module.
 * Select numerical method flag `SELECTOR_METHOD`. Available options:
     * First-order splitting `METHOD_FIRST_ORDER_SPLITTING`
     * Second-order IMEX ARS(2, 2, 2) `METHOD_IMEX_ARS_222`
+* Choose whether you want to produce intermediate output files by setting `SELECTOR_PERC_OUTPUT` to `PERC_OUTPUT_ON` or to `PERC_OUTPUT_OFF` otherwise. The `PERC_FREQ`  is the percentage controlling their number: for instance, `PERC_FREQ = 1.0d0` would correspond to 100 output files.
 
 
 
@@ -93,7 +94,7 @@ A simple makefile is used:
 There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
 I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
-* Specify the number of cells you used in the `m_parameters.f90` module inside the script `postprocessing/plot.py` or `postprocessing/contourplot.py`, depending on which type of plot you wish to draw.
+* Specify the number of cells you used in the `m_parameters.f90` module inside the script `plot/plot.py` or `plot/contourplot.py`, depending on which type of plot you wish to draw.
 
     Example:
 
@@ -109,7 +110,7 @@ I have not yet implemented the comfortable authomatic plotting, so some things s
     make contour_plot
     ```
 
-  The image file will be saved as `schlieren-2d.png` in the `postprocessing/` directory.
+  The image file will be saved as `schlieren-2d.png` in the `plot/` directory.
 
 
 * To draw a 1D cross-section of the 2D data along the x axis:
@@ -118,7 +119,7 @@ I have not yet implemented the comfortable authomatic plotting, so some things s
     make plot
     ```
 
-  The image file will be saved as `huvetaw-1d.png` in the `postprocessing/` directory.
+  The image file will be saved as `huvetaw-1d.png` in the `plot/` directory.
 
 
 

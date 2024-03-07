@@ -32,7 +32,7 @@ $(BLD_DIR)/m_methods.o: $(BLD_DIR)/m_model.o $(BLD_DIR)/m_aux.o
 run: $(BLD_DIR)/$(EXEC)
 	$(BLD_DIR)/$(EXEC)
 
-.PHONY: clean debug plot
+.PHONY: clean debug plot rm_seq
 clean:
 	$(RM) -r $(BLD_DIR)
 	$(RM) $(SRC_DIR)/*.mod
@@ -45,7 +45,10 @@ debug:
 	@echo "EXEC = $(EXEC)"
 
 contour_plot:
-	@python postprocessing/contourplot.py
+	@python plot/contourplot.py
 
 plot:
-	@python postprocessing/plot.py
+	@python plot/plot.py
+
+rm_seq:
+	@rm out/*_t=*.dat
