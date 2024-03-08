@@ -5,6 +5,7 @@
 .idea/
 **/__pychache__
 build/
+img/
 
 **/*.mod
 
