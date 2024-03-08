@@ -45,6 +45,7 @@ debug:
 	@echo "EXEC = $(EXEC)"
 
 plot:
+	@mkdir -p img
 	@python plot/xsgnplot.py
 
 rm_seq:
