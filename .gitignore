@@ -6,6 +6,7 @@
 **/__pychache__
 build/
 img/
+plot/__pycache__
 
 **/*.mod
 
