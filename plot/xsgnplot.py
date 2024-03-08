@@ -99,9 +99,9 @@ class Solution:
 
 
 if __name__ == '__main__':
-    file = '../out/res.dat'
-    png = '../img/schlieren-2d.png'
-    png_1d = '../img/huvetaw-1d.png'
+    file = 'out/res.dat'
+    png = 'img/schlieren-2d.png'
+    png_1d = 'img/huvetaw-1d.png'
     solution = Solution(file)
     solution.plot_schlieren(png)
     solution.plot_sections(png_1d)
