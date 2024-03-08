@@ -32,7 +32,7 @@ $(BLD_DIR)/m_methods.o: $(BLD_DIR)/m_model.o $(BLD_DIR)/m_aux.o
 run: $(BLD_DIR)/$(EXEC)
 	$(BLD_DIR)/$(EXEC)
 
-.PHONY: clean debug plot generate_images rm_seq rm_img_seq
+.PHONY: clean debug plot generate_images rm_seq rm_img_seq make_video
 clean:
 	$(RM) -r $(BLD_DIR)
 	$(RM) $(SRC_DIR)/*.mod
@@ -56,3 +56,7 @@ rm_seq:
 
 rm_img_seq:
 	@rm img/*_t=*.png
+
+make_video:
+	@mkdir -p vid
+	@python plot/make-video.py
