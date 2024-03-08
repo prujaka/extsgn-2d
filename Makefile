@@ -44,11 +44,8 @@ debug:
 	@echo "MOD_OBJS = $(MOD_OBJS)"
 	@echo "EXEC = $(EXEC)"
 
-contour_plot:
-	@python plot/contourplot.py
-
 plot:
-	@python plot/plot.py
+	@python plot/xsgnplot.py
 
 rm_seq:
 	@rm out/*_t=*.dat
