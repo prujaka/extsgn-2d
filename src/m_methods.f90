@@ -14,7 +14,6 @@ module m_methods
 
     call set_mesh(x,y)
     call set_ic(x,y,prim)
-    ! call input_matrix_flat(prim, filename)
     call prim_to_cons(prim,cons)
     it = 0
     time = 0.0d0
@@ -40,7 +39,7 @@ module m_methods
     implicit none
     real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
-    character(len=20) :: filename = 'img/file.txt'
+    character(len=20) :: filename = 'out/file.txt'
 
     select case(SELECTOR_IC)
       case(IC_RP_X)
