@@ -2,8 +2,8 @@ import numpy as np
 from PIL import Image
 
 Nx = Ny = 500
-image = Image.open('luci.jpg')
-image = image.resize((Nx,Ny))
+image = Image.open('img/luci.jpg')
+image = image.resize((Nx, Ny))
 image = image.convert('L')
 data = np.asarray(image)
 
