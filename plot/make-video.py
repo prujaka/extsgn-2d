@@ -3,15 +3,17 @@ import os
 from os.path import isfile, join
 
 
-def create_video(png_files, output_video_path, duration_seconds):
+def create_video(png_files, output_video_path, duration_seconds, fps=24):
+    # Define the frame size based on the first image
     first_image = cv2.imread(png_files[0])
     height, width, _ = first_image.shape
 
+    # Define the video codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    video_writer = cv2.VideoWriter(output_video_path, fourcc, 30, (width,
-                                                                   height))
+    video_writer = cv2.VideoWriter(output_video_path, fourcc, fps, (width,
+                                                                    height))
 
-    num_frames = int(30 * duration_seconds)
+    num_frames = int(fps * duration_seconds)
     frames_per_image = int(num_frames / len(png_files))
     remaining_frames = num_frames - frames_per_image * len(png_files)
 
