@@ -39,7 +39,7 @@ module m_methods
     implicit none
     real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
-    character(len=20) :: filename = 'out/file.txt'
+    character(len=20) :: filename = 'out/init_matrix.dat'
 
     select case(SELECTOR_IC)
       case(IC_RP_X)
@@ -250,7 +250,7 @@ module m_methods
     real(dp), intent(inout) :: prim(NEQS,0:NX+1,0:NY+1)
     integer, intent(inout) :: it
     real(dp), intent(inout) :: time
-    real(dp) :: milestone=0.0d0, t1
+    real(dp) :: milestone_print=0.0d0, milestone_out=0.0d0, t1
 
     print*, ''
     print*, 'Calculation started.'
@@ -267,16 +267,16 @@ module m_methods
           call timestep_imex(prim)
       end select
 
-      call print_percentage(time,t1,milestone,it)
+      call print_percentage(time,t1,milestone_print,it)
       if (SELECTOR_PERC_OUTPUT == PERC_OUTPUT_ON) then
-        call output_dat_checkpoint(x,y,prim,time)
+        call output_dat_checkpoint(x,y,prim,time,milestone_out)
       endif
 
       it=it+1
       time=time+dt
 
       if (SELECTOR_PERC_OUTPUT == PERC_OUTPUT_ON) then
-        call output_dat_checkpoint(x,y,prim,time)
+        call output_dat_checkpoint(x,y,prim,time,milestone_out)
       endif
     enddo
 
