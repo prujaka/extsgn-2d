@@ -1,8 +1,8 @@
 import numpy as np
 from PIL import Image
 
-Nx = Ny = 500
-image = Image.open('img/luci.jpg')
+Nx = Ny = 100
+image = Image.open('img/schlieren-2d.png')
 image = image.resize((Nx, Ny))
 image = image.convert('L')
 data = np.asarray(image)
@@ -12,11 +12,11 @@ data = np.asarray(image)
 # image_test = Image.fromarray(matrix*255)
 # image_test.save('image-test.jpg')
 
-matrix = ((np.amax(data) - data)/np.amax(data))
+matrix = ((np.amax(data) - data) / np.amax(data))
 # image_test = Image.fromarray(matrix*255)
 # image_test.save('image-test.jpg')
 
-with open('file.txt', 'w') as f:
+with open('out/init_matrix.dat', 'w') as f:
     for i in range(Nx):
         for j in range(Ny):
             f.write(str(matrix[i, j]))
