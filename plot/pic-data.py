@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 
 Nx = Ny = 100
-image = Image.open('img/schlieren-2d.png')
+image = Image.open('img/input.png')
 image = image.resize((Nx, Ny))
 image = image.convert('L')
 data = np.asarray(image)
