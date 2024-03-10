@@ -72,11 +72,11 @@ contains
     close(10)
   end subroutine output_dat
 
-  subroutine output_dat_checkpoint(x,y,prim,time)
+  subroutine output_dat_checkpoint(x,y,prim,time,milestone)
     implicit none
     real(dp), intent(in) :: x(0:NX+1), y(0:NY+1), prim(NEQS,0:NX+1,0:NY+1)
     real(dp), intent(in) :: time
-    real(dp) :: milestone
+    real(dp), intent(inout) :: milestone
     real(dp) :: percentage
     character(len=30) :: filename
     integer :: i,k,j
