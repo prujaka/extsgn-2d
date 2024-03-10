@@ -39,7 +39,7 @@ module m_methods
     implicit none
     real(dp), intent(in)  :: x(0:NX+1), y(0:NY+1)
     real(dp), intent(out) :: prim(NEQS, 0:NX+1, 0:NY+1)
-    character(len=20) :: filename = 'out/file.txt'
+    character(len=20) :: filename = 'out/init_matrix.dat'
 
     select case(SELECTOR_IC)
       case(IC_RP_X)
