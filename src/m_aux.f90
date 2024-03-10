@@ -8,7 +8,7 @@ contains
     real(DP), intent(in) :: time
     real(DP), intent(inout) :: t1, milestone
     integer, intent(in) :: it
-    real(DP) :: eta, t2, percentage
+    real(DP) :: eta, t2, percentage, frequency=1.0d0
     real(DP) :: s
     integer :: h, m
     character(len=100) :: fmt
@@ -31,7 +31,7 @@ contains
       'dt ', dt, ' | ', &
        t2-t1, ' sec | ', &
       'ETA  ', h, ':', m, ':', int(s), ' |'
-      milestone = milestone + perc_freq
+      milestone = milestone + frequency
       call cpu_time(t1)
     endif
   end subroutine print_percentage
@@ -88,7 +88,7 @@ contains
       else
         write(filename,'(A,F8.5,A)') 'out/res_t=', time, '.dat'
       endif
-      milestone = milestone + PERC_FREQ
+      milestone = milestone + 100.d0 / float(N_FILES)
 
       open(unit=10,file=filename)
       do i=1, NX

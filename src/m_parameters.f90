@@ -61,8 +61,8 @@ module m_parameters
   character(LEN=NAMELEN), parameter :: FILE_DAT    = 'out/res.dat'
   character(LEN=NAMELEN), parameter :: FILE_VTK    = 'out/res.vtk'
   character(LEN=13)                 :: DATA_FORMAT = '(9(e11.4,1x))'
-  real(dp), parameter               :: PERC_FREQ   = 1.0d0
   integer, parameter                :: VTK_STEP    = 1
+  integer, parameter                :: N_FILES     = 20
   integer, parameter                :: GENERATE_VTK  = 0
 
   ! Numerical method specifier constants
@@ -84,7 +84,7 @@ module m_parameters
   end enum
 
   ! Initial condition and Numerical method specifier flags
-  integer, parameter :: SELECTOR_IC = IC_RP_CYL
+  integer, parameter :: SELECTOR_IC = IC_MATRIX
   integer, parameter :: SELECTOR_METHOD = METHOD_IMEX_ARS_222
   integer, parameter :: SELECTOR_PERC_OUTPUT = PERC_OUTPUT_ON
 
