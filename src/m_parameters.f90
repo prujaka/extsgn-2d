@@ -8,14 +8,14 @@ module m_parameters
   real(dp), parameter :: GG        = 9.81d0 ! Gravity acceleration
 
   ! Time-related m_parameters
-  real(dp), parameter :: TFIN      = 40.0d0 ! Final time
+  real(dp), parameter :: TFIN      = 15.0d0 ! Final time
   real(dp), parameter :: CFL       = 0.5d0 ! CFL value
   integer, parameter  :: ITFIN     = 100000000 ! Max number of iterations
   real(dp)            :: dt        = 1.0d-8 ! initial dt
 
   ! Computational domain m_parameters: number of cells, and domain boudaries
-  integer, parameter  :: NX        = 100
-  integer, parameter  :: NY        = 100
+  integer, parameter  :: NX        = 500
+  integer, parameter  :: NY        = 500
   real(dp), parameter :: XL        = -300.0d0
   real(dp), parameter :: XR        = 300.0d0
   real(dp), parameter :: YL        = -300.0d0
@@ -62,7 +62,7 @@ module m_parameters
   character(LEN=NAMELEN), parameter :: FILE_VTK    = 'out/res.vtk'
   character(LEN=13)                 :: DATA_FORMAT = '(9(e11.4,1x))'
   integer, parameter                :: VTK_STEP    = 1
-  integer, parameter                :: N_FILES     = 20
+  integer, parameter                :: N_FILES     = 100
   integer, parameter                :: GENERATE_VTK  = 0
 
   ! Numerical method specifier constants
