@@ -1,14 +1,12 @@
 import cv2
 import os
 from os.path import isfile, join
+import imageio
 
 
 def create_video(png_files, output_video_path, duration_seconds, fps=24):
-    # Define the frame size based on the first image
     first_image = cv2.imread(png_files[0])
     height, width, _ = first_image.shape
-
-    # Define the video codec and create VideoWriter object
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     video_writer = cv2.VideoWriter(output_video_path, fourcc, fps, (width,
                                                                     height))
@@ -28,6 +26,19 @@ def create_video(png_files, output_video_path, duration_seconds, fps=24):
     video_writer.release()
 
 
+def create_gif(png_files, output_gif_path, duration_seconds):
+    # Read the first image to get dimensions
+    first_image = imageio.imread(png_files[0])
+    height, width, _ = first_image.shape
+
+    # Create the GIF file with a specified duration
+    with imageio.get_writer(output_gif_path, duration=duration_seconds) as gif_writer:
+        for i, png_file in enumerate(png_files):
+            frame = imageio.imread(png_file)
+            gif_writer.append_data(frame)
+            print(f'Image {png_file} added to the gif, {i + 1}/{len(png_files)}')
+
+
 if __name__ == "__main__":
     img_dir = 'img'
     png_files = [join(img_dir, f) for f in os.listdir(img_dir)
@@ -36,8 +47,10 @@ if __name__ == "__main__":
     png_files = sorted(png_files)
 
     output_video_path = "vid/output_video.mp4"
-    duration_seconds = 5
+    output_gif_path = "vid/output_gif.gif"
+    duration_seconds = 15
 
-    create_video(png_files, output_video_path, duration_seconds)
+    # create_video(png_files, output_video_path, duration_seconds)
+    create_gif(png_files, output_gif_path, duration_seconds)
 
     print(f"Video created at: {output_video_path}")
