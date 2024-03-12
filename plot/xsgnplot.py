@@ -31,16 +31,7 @@ def create_testdata(file, nx=10, ny=5):
 
 class Solution:
     def __init__(self, file):
-        with open(file) as f:
-            lines = [line.strip() for line in f.readlines()]
-
-        x = np.array([float(line.split()[0]) for line in lines])
-        y = np.array([float(line.split()[1]) for line in lines])
-        h = np.array([float(line.split()[2]) for line in lines])
-        u = np.array([float(line.split()[3]) for line in lines])
-        v = np.array([float(line.split()[4]) for line in lines])
-        eta = np.array([float(line.split()[5]) for line in lines])
-        w = np.array([float(line.split()[6]) for line in lines])
+        x, y, h, u, v, eta, w, t = np.loadtxt(file, unpack=True)
 
         self.x = x.reshape((n_x, n_y))
         self.y = y.reshape((n_x, n_y))
@@ -49,7 +40,7 @@ class Solution:
         self.v = v.reshape((n_x, n_y))
         self.eta = eta.reshape((n_x, n_y))
         self.w = w.reshape((n_x, n_y))
-        self.t = float(lines[0].split()[7])
+        self.t = t[0]
 
         mid_index = n_y // 2 - 1
 
