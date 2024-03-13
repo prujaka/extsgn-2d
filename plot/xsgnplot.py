@@ -3,8 +3,15 @@ import matplotlib.pyplot as plt
 import random
 from matplotlib.colors import LinearSegmentedColormap
 
-n_x = 500
-n_y = 500
+
+def get_meshsize(parameters_path='src/m_parameters.f90'):
+    with open(parameters_path, 'r') as f:
+        lines = f.readlines()
+    nx_line, ny_line = [line for line in lines
+                        if 'NX' in line or 'NY' in line][:2]
+    nx = int(nx_line.split()[-1])
+    ny = int(ny_line.split()[-1])
+    return nx, ny
 
 
 def truncate_colormap(cmap_name, cutoff_percentage=0.8):
@@ -33,16 +40,18 @@ class Solution:
     def __init__(self, file):
         x, y, h, u, v, eta, w, t = np.loadtxt(file, unpack=True)
 
-        self.x = x.reshape((n_x, n_y))
-        self.y = y.reshape((n_x, n_y))
-        self.h = h.reshape((n_x, n_y))
-        self.u = u.reshape((n_x, n_y))
-        self.v = v.reshape((n_x, n_y))
-        self.eta = eta.reshape((n_x, n_y))
-        self.w = w.reshape((n_x, n_y))
+        nx, ny = get_meshsize()
+
+        self.x = x.reshape((nx, ny))
+        self.y = y.reshape((nx, ny))
+        self.h = h.reshape((nx, ny))
+        self.u = u.reshape((nx, ny))
+        self.v = v.reshape((nx, ny))
+        self.eta = eta.reshape((nx, ny))
+        self.w = w.reshape((nx, ny))
         self.t = t[0]
 
-        mid_index = n_y // 2 - 1
+        mid_index = ny // 2 - 1
 
         self.section_x = self.x[:, mid_index]
         self.section_h = self.h[:, mid_index]
