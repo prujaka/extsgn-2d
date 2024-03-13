@@ -1,7 +1,7 @@
 from xsgnplot import Solution, truncate_colormap
 from os import listdir
 from os.path import isfile, join
-import numpy as np
+from matplotlib.colors import Normalize
 
 
 if __name__ == '__main__':
@@ -10,17 +10,24 @@ if __name__ == '__main__':
                   if isfile(join(data_dir, f)) and 'res_t=' in f]
     data_files = sorted(data_files)
 
-    cmap = truncate_colormap('ocean_r', cutoff_percentage=0.7)
+    maxs = []
+    mins = []
+    for file in data_files:
+        res = Solution(file)
+        maxs.append(res.h.max())
+        mins.append(res.h.min())
 
-    matrix_file = 'out/init_matrix.dat'
-    matrix = np.loadtxt(matrix_file)
+    h_max = max(maxs)
+    h_min = min(mins)
 
-    init_data_max = matrix.max()
-    init_data_min = matrix.min()
-    print(init_data_max, init_data_min)
+    print(h_min, h_max)
+
+    color_norm = Normalize(vmin=h_min, vmax=h_max)
+
+    cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
 
     for (i, file) in enumerate(data_files):
         res = Solution(file)
         img_file = file.replace('out', 'img').replace('.dat', '.png')
-        res.plot_artsy(img_file, cmap=cmap)
+        res.plot_artsy(img_file, cmap=cmap, norm=color_norm)
         print(f'Generating {img_file}, {i + 1} out of {len(data_files)}')
