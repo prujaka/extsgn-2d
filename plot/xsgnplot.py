@@ -57,26 +57,26 @@ class Solution:
         self.grad_h_abs = grad_h_abs
         self.schlieren = schlieren
 
-    def plot_schlieren(self, file):
+    def plot_schlieren(self, file, cmap='Blues'):
         fig, ax = plt.subplots()
         fig.set_size_inches(5, 5)
 
         ax.contourf(self.x, self.y, self.schlieren, levels=100,
-                    cmap=plt.get_cmap('Blues'))
+                    cmap=plt.get_cmap(cmap))
 
-        plt.savefig(file, dpi=1200)
+        plt.savefig(file, dpi=300)
         plt.close()
 
-    def plot_artsy(self, file, cmap='bone_r'):
+    def plot_artsy(self, file, cmap='bone_r', norm=None):
         fig, ax = plt.subplots()
         fig.set_size_inches(5, 5)
 
         ax.contourf(self.x, -self.y, self.h.T, levels=100,
-                    cmap=plt.get_cmap(cmap))
+                    cmap=plt.get_cmap(cmap), norm=norm)
 
         ax.axis('off')
         # fig.patch.set_alpha(0)
-        plt.savefig(file, dpi=1200)
+        plt.savefig(file, dpi=300)
         plt.close()
 
     def plot_sections(self, file):
@@ -112,7 +112,7 @@ class Solution:
                 axs[i, j].legend()
                 axs[i, j].grid()
 
-        plt.savefig(file, dpi=600)
+        plt.savefig(file, dpi=300)
         plt.close()
 
 
@@ -123,7 +123,7 @@ if __name__ == '__main__':
     png_1d = 'img/huvetaw-1d.png'
     solution = Solution(file)
 
-    cmap = truncate_colormap('ocean_r', cutoff_percentage=0.7)
+    cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
     solution.plot_artsy(png_artsy, cmap=cmap)
-    # solution.plot_schlieren(png)
-    # solution.plot_sections(png_1d)
+    solution.plot_schlieren(png)
+    solution.plot_sections(png_1d)
