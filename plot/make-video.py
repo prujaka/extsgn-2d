@@ -32,11 +32,13 @@ def create_gif(png_files, output_gif_path, duration_seconds):
     height, width, _ = first_image.shape
 
     # Create the GIF file with a specified duration
-    with imageio.get_writer(output_gif_path, duration=duration_seconds) as gif_writer:
+    with imageio.get_writer(output_gif_path,
+                            duration=duration_seconds) as gif_writer:
         for i, png_file in enumerate(png_files):
             frame = imageio.imread(png_file)
             gif_writer.append_data(frame)
-            print(f'Image {png_file} added to the gif, {i + 1}/{len(png_files)}')
+            print(f'Image {png_file} added to the gif,'
+                  f'{i + 1}/{len(png_files)}')
 
 
 if __name__ == "__main__":
@@ -50,7 +52,7 @@ if __name__ == "__main__":
     output_gif_path = "vid/output_gif.gif"
     duration_seconds = 15
 
-    # create_video(png_files, output_video_path, duration_seconds)
-    create_gif(png_files, output_gif_path, duration_seconds)
+    create_video(png_files, output_video_path, duration_seconds)
+    # create_gif(png_files, output_gif_path, duration_seconds)
 
     print(f"Video created at: {output_video_path}")
