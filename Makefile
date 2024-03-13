@@ -32,7 +32,8 @@ $(BLD_DIR)/m_methods.o: $(BLD_DIR)/m_model.o $(BLD_DIR)/m_aux.o
 run: $(BLD_DIR)/$(EXEC)
 	$(BLD_DIR)/$(EXEC)
 
-.PHONY: clean debug plot generate_images rm_seq rm_img_seq make_video
+.PHONY: clean debug plot generate_images rm_seq rm_img_seq generate_video \
+	generate_matrix
 clean:
 	$(RM) -r $(BLD_DIR)
 	$(RM) $(SRC_DIR)/*.mod
@@ -51,12 +52,26 @@ plot:
 generate_images:
 	@python plot/plot-sequence.py
 
+generate_video:
+	@mkdir -p vid
+	@python plot/make-video.py
+
+generate_matrix:
+	@python plot/pic-data.py
+
 rm_seq:
 	@rm out/*_t=*.dat
 
 rm_img_seq:
 	@rm img/*_t=*.png
 
-make_video:
-	@mkdir -p vid
-	@python plot/make-video.py
+clean_sequences:
+	@make rm_seq
+	@make rm_img_seq
+
+complete_video_circuit_artsy:
+	@make clean_sequences
+	@make generate_matrix
+	@make run
+	@make generate_images
+	@make generate_video

@@ -1,9 +1,23 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+from matplotlib.colors import LinearSegmentedColormap
 
-n_x = 100
-n_y = 100
+n_x = 500
+n_y = 500
+
+
+def truncate_colormap(cmap_name, cutoff_percentage=0.8):
+    original_cmap = plt.get_cmap(cmap_name)
+    num_colors = original_cmap.N
+    cutoff_index = int(num_colors * cutoff_percentage)
+    new_colors = original_cmap(np.linspace(0, cutoff_index / num_colors,
+                                           cutoff_index))
+    truncated_cmap_name = f'truncated_{cmap_name}'
+    truncated_cmap = LinearSegmentedColormap.from_list(truncated_cmap_name,
+                                                       new_colors)
+
+    return truncated_cmap
 
 
 def create_testdata(file, nx=10, ny=5):
@@ -17,16 +31,7 @@ def create_testdata(file, nx=10, ny=5):
 
 class Solution:
     def __init__(self, file):
-        with open(file) as f:
-            lines = [line.strip() for line in f.readlines()]
-
-        x = np.array([float(line.split()[0]) for line in lines])
-        y = np.array([float(line.split()[1]) for line in lines])
-        h = np.array([float(line.split()[2]) for line in lines])
-        u = np.array([float(line.split()[3]) for line in lines])
-        v = np.array([float(line.split()[4]) for line in lines])
-        eta = np.array([float(line.split()[5]) for line in lines])
-        w = np.array([float(line.split()[6]) for line in lines])
+        x, y, h, u, v, eta, w, t = np.loadtxt(file, unpack=True)
 
         self.x = x.reshape((n_x, n_y))
         self.y = y.reshape((n_x, n_y))
@@ -35,7 +40,7 @@ class Solution:
         self.v = v.reshape((n_x, n_y))
         self.eta = eta.reshape((n_x, n_y))
         self.w = w.reshape((n_x, n_y))
-        self.t = float(lines[0].split()[7])
+        self.t = t[0]
 
         mid_index = n_y // 2 - 1
 
@@ -49,16 +54,29 @@ class Solution:
         grad_h = np.gradient(self.h)
         grad_h_abs = np.sqrt(grad_h[0] ** 2 + grad_h[1] ** 2)
         schlieren = np.log(1 + np.log(1 + 25 * grad_h_abs))
+        self.grad_h_abs = grad_h_abs
         self.schlieren = schlieren
 
-    def plot_schlieren(self, file):
+    def plot_schlieren(self, file, cmap='Blues'):
         fig, ax = plt.subplots()
         fig.set_size_inches(5, 5)
 
         ax.contourf(self.x, self.y, self.schlieren, levels=100,
-                    cmap=plt.get_cmap('Blues'))
+                    cmap=plt.get_cmap(cmap))
 
-        plt.savefig(file, dpi=1200)
+        plt.savefig(file, dpi=300)
+        plt.close()
+
+    def plot_artsy(self, file, cmap='bone_r', norm=None):
+        fig, ax = plt.subplots()
+        fig.set_size_inches(5, 5)
+
+        ax.contourf(self.x, -self.y, self.h.T, levels=100,
+                    cmap=plt.get_cmap(cmap), norm=norm)
+
+        ax.axis('off')
+        # fig.patch.set_alpha(0)
+        plt.savefig(file, dpi=300)
         plt.close()
 
     def plot_sections(self, file):
@@ -94,14 +112,18 @@ class Solution:
                 axs[i, j].legend()
                 axs[i, j].grid()
 
-        plt.savefig(file, dpi=600)
+        plt.savefig(file, dpi=300)
         plt.close()
 
 
 if __name__ == '__main__':
     file = 'out/res.dat'
     png = 'img/schlieren-2d.png'
+    png_artsy = 'img/artsy.png'
     png_1d = 'img/huvetaw-1d.png'
     solution = Solution(file)
+
+    cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
+    solution.plot_artsy(png_artsy, cmap=cmap)
     solution.plot_schlieren(png)
     solution.plot_sections(png_1d)
