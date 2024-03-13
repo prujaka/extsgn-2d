@@ -1,10 +1,12 @@
 import numpy as np
 from PIL import Image
 from matplotlib import pyplot as plt
+from xsgnplot import get_meshsize
 
-Nx = Ny = 500
+
+nx, ny = get_meshsize()
 image = Image.open('img/input.jpg')
-image = image.resize((Nx, Ny))
+image = image.resize((nx, ny))
 image = image.convert('L')
 data = np.asarray(image)
 
@@ -20,8 +22,8 @@ plt.savefig('img/image-test.png')
 # image_test.save('img/image-test.png')
 
 with open('out/init_matrix.dat', 'w') as f:
-    for i in range(Nx):
-        for j in range(Ny):
+    for i in range(nx):
+        for j in range(ny):
             f.write(str(matrix[i, j]))
             f.write('\n')
 
