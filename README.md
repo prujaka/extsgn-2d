@@ -92,34 +92,16 @@ A simple makefile is used:
 ### Postprocessing
 
 There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
-I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
 
-* Specify the number of cells you used in the `m_parameters.f90` module inside the script `plot/plot.py` or `plot/contourplot.py`, depending on which type of plot you wish to draw.
-
-    Example:
-
-    ```python
-    n_x = 500
-    n_y = 500
-    ```
 * Make sure that in your terminal, you are in the main directory of the repo so that you could use the Makefile.
 
-* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, use the following make command:
-
-    ```shell
-    make contour_plot
-    ```
-
-  The image file will be saved as `schlieren-2d.png` in the `plot/` directory.
-
-
-* To draw a 1D cross-section of the 2D data along the x axis:
+* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, use the following make command, as well as the 1D cross-section of the 2D data along the x axis, use the following command:
 
     ```shell
     make plot
     ```
 
-  The image file will be saved as `huvetaw-1d.png` in the `plot/` directory.
+  They will be saved as `schlieren-2d.png` and `huvetaw-1d.png` in the `img/` directory.
 
 
 
