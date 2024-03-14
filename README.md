@@ -91,11 +91,11 @@ A simple makefile is used:
 
 ### Postprocessing
 
-There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
+There are two available kinds of plots: the 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
 
-* Make sure that in your terminal, you are in the main directory of the repo so that you could use the Makefile.
+* First, make sure that in your terminal, you are in the root directory of the git repository so that you could use the Makefile.
 
-* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, use the following make command, as well as the 1D cross-section of the 2D data along the x axis, use the following command:
+* Then, to draw both plots, use the following command:
 
     ```shell
     make plot
