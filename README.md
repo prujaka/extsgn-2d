@@ -41,11 +41,13 @@ Each file in `scr/`  except `main.f90` is a module.
 >
 > `img/`
 >
-> > `contourplot.py` numerical schlieren representation of the 2D output
+> > `make-video.py` a script to generate a video from the sequence of images
 > >
 > > `pic-data.py ` a fun script to import 2D images as an initial condition.
 > >
-> > `plot.py` extracts and plots the horizontal 1D section from the 2D output data
+> > `plot-sequence.py` for generating a sequence of images from simulation data
+> >
+> > `plot.py` for plotting 1D and 2D results
 
 
 
