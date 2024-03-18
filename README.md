@@ -91,7 +91,8 @@ A simple makefile is used:
 
 
 
-### Postprocessing
+## Postprocessing
+### Solution plots
 
 There are three available kinds of plots:
 1. Two-dimensional contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied;
@@ -110,7 +111,17 @@ In order to plot the solution:
 
   They will appear as `schlieren-2d.png` `huvetaw-1d.png` and `artsy.png` in the `img/` directory.
 
+### Intermediate output plots and videos
+If you chose to output intermediate simulation data, you can generate images from it:
+```zsh
+make generate_images
+```
+which will appear in the `img/` directory, and also, to compile an `.mp4` video out of them:
 
+```zsh
+make generate_video
+```
+which will be saved in the `vid/` folder.
 
 ## Guidelines for repository contributors
 
