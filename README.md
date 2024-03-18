@@ -16,6 +16,7 @@ For postprocessing:
 
 * python 3
 * matplotlib
+* cv2 (for making output videos)
 * Pillow (optional, for reading 2D images as initial data)
 
 ### Installing
