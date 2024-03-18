@@ -87,24 +87,28 @@ A simple makefile is used:
 * `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
 * `make clean` to remove all the `.mod` and bin files.
-* `make contour_plot` to plot a full 2D contour plot
-* `make plot` to plot a horizontal 1D cross-section of the solution.
+* `make plot` to plot a full 2D contour plot, its horizontal 1D cross-section, and an artsy version of the 2D contour plot
 
 
 
 ### Postprocessing
 
-There are two available kinds of plots: the 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
+There are three available kinds of plots:
+1. Two-dimensional contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied;
+2. Cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`);
+3. Artsy canvas version of the water depth `h` 2D contour plot
+
+In order to plot the solution:
 
 * First, make sure that in your terminal, you are in the root directory of the git repository so that you could use the Makefile.
 
-* Then, to draw both plots, use the following command:
+* Then, to draw all the plots mentioned above, use the following command:
 
     ```shell
     make plot
     ```
 
-  They will be saved as `schlieren-2d.png` and `huvetaw-1d.png` in the `img/` directory.
+  They will appear as `schlieren-2d.png` `huvetaw-1d.png` and `artsy.png` in the `img/` directory.
 
 
 
