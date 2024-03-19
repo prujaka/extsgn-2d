@@ -43,7 +43,7 @@ Each file in `scr/`  except `main.f90` is a module.
 >
 > > `make-video.py` a script to generate a video from the sequence of images
 > >
-> > `pic-data.py ` a fun script to import 2D images as an initial condition.
+> > `pic-data.py` a fun script to import 2D images as an initial condition.
 > >
 > > `plot-sequence.py` for generating a sequence of images from simulation data
 > >
@@ -122,6 +122,19 @@ which will appear in the `img/` directory, and also, to compile an `.mp4` video 
 make generate_video
 ```
 which will be saved in the `vid/` folder.
+
+### Bonus: custom image of your choice as initial data for simulations
+
+Imagine possessing the ability to freeze time and utilize a 3D printer to generate an initial configuration of a fluid surface. Upon uploading any picture, the printer converts it to grayscale, with darker pixels indicating higher elevations on the surface. This grayscale image serves as the starting point for a numerical simulation. And then you press the play button and let it gracefully disintegrate over time.
+
+Good news is that you actually have this 3D printer in the `pic-data.py` script. You can choose whatever picture you want, put it to the `img/` directory under the name `input.jpg`, and generate the initial data by executing the command:
+
+```zsh
+make generate_matrix
+```
+
+Then, set the `SELECTOR_IC` to `IC_MATRIX` in the `m_parameters.f90` module and run the simulation as described in the above sections.
+
 
 ## Guidelines for repository contributors
 
