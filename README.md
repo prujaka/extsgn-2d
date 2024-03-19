@@ -66,9 +66,10 @@ Each file in `scr/`  except `main.f90` is a module.
     * Domain size `XL`, `XR`, `YL`, `YR`
 
 * Set initial condition flag `SELECTOR_IC`. Available options:
-    * 1D Riemann problems in x or y directions `IC_RP_X`, `IC_RP_Y`
-    * Cylindrical and square 2D Riemann problems `IC_RP_CYL`, `IC_RP_SQR`
-    * Generalized Riemann problems: piecewise initial data perturbed with sine functions `IC_GENRP_SINX` and  `IC_GENRP_SINX_SINY`
+    * 1D Riemann problems in x or y directions: `IC_RP_X`, `IC_RP_Y`
+    * Cylindrical and square 2D Riemann problems: `IC_RP_CYL`, `IC_RP_SQR`
+    * Generalized Riemann problems: piecewise initial data perturbed with sine functions: `IC_GENRP_SINX`, `IC_GENRP_SINX_SINY`
+    * Load initial data from a file: `IC_MATRIX`
 * Set initial discontinuity position `XMID` `YMID` and cylunder `RADIUS` for the Riemann problem. `RADIUS` is Also used as the HALF square side for the square 2D RP
 
 * Set boundary condition coefficients of the velocities in the ghost cells:
