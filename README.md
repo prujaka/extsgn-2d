@@ -16,6 +16,7 @@ For postprocessing:
 
 * python 3
 * matplotlib
+* cv2 (for making output videos)
 * Pillow (optional, for reading 2D images as initial data)
 
 ### Installing
@@ -40,11 +41,13 @@ Each file in `scr/`  except `main.f90` is a module.
 >
 > `img/`
 >
-> > `contourplot.py` numerical schlieren representation of the 2D output
+> > `make-video.py` a script to generate a video from the sequence of images
 > >
-> > `pic-data.py ` a fun script to import 2D images as an initial condition.
+> > `pic-data.py` a fun script to import 2D images as an initial condition.
 > >
-> > `plot.py` extracts and plots the horizontal 1D section from the 2D output data
+> > `plot-sequence.py` for generating a sequence of images from simulation data
+> >
+> > `plot.py` for plotting 1D and 2D results
 
 
 
@@ -63,9 +66,10 @@ Each file in `scr/`  except `main.f90` is a module.
     * Domain size `XL`, `XR`, `YL`, `YR`
 
 * Set initial condition flag `SELECTOR_IC`. Available options:
-    * 1D Riemann problems in x or y directions `IC_RP_X`, `IC_RP_Y`
-    * Cylindrical and square 2D Riemann problems `IC_RP_CYL`, `IC_RP_SQR`
-    * Generalized Riemann problems: piecewise initial data perturbed with sine functions `IC_GENRP_SINX` and  `IC_GENRP_SINX_SINY`
+    * 1D Riemann problems in x or y directions: `IC_RP_X`, `IC_RP_Y`
+    * Cylindrical and square 2D Riemann problems: `IC_RP_CYL`, `IC_RP_SQR`
+    * Generalized Riemann problems: piecewise initial data perturbed with sine functions: `IC_GENRP_SINX`, `IC_GENRP_SINX_SINY`
+    * Load initial data from a file: `IC_MATRIX`
 * Set initial discontinuity position `XMID` `YMID` and cylunder `RADIUS` for the Riemann problem. `RADIUS` is Also used as the HALF square side for the square 2D RP
 
 * Set boundary condition coefficients of the velocities in the ghost cells:
@@ -73,7 +77,7 @@ Each file in `scr/`  except `main.f90` is a module.
 * Select numerical method flag `SELECTOR_METHOD`. Available options:
     * First-order splitting `METHOD_FIRST_ORDER_SPLITTING`
     * Second-order IMEX ARS(2, 2, 2) `METHOD_IMEX_ARS_222`
-* Choose whether you want to produce intermediate output files by setting `SELECTOR_PERC_OUTPUT` to `PERC_OUTPUT_ON` or to `PERC_OUTPUT_OFF` otherwise. The `PERC_FREQ`  is the percentage controlling their number: for instance, `PERC_FREQ = 1.0d0` would correspond to 100 output files.
+* Choose whether you want to produce intermediate output files by setting `SELECTOR_PERC_OUTPUT` to `PERC_OUTPUT_ON` or to `PERC_OUTPUT_OFF` otherwise. The `N_FILES` parameter controls the number of intermediate output files.
 
 
 
@@ -84,43 +88,53 @@ A simple makefile is used:
 * `make` to compile the project with the optimization flags for faster computations
 * `make run` to run execute the code
 * `make clean` to remove all the `.mod` and bin files.
-* `make contour_plot` to plot a full 2D contour plot
-* `make plot` to plot a horizontal 1D cross-section of the solution.
+* `make plot` to plot a full 2D contour plot, its horizontal 1D cross-section, and an artsy version of the 2D contour plot
 
 
 
-### Postprocessing
+## Postprocessing
+### Solution plots
 
-There are two available kinds of plots: the 2D contour plot of the water depth `h` and the cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`).
-I have not yet implemented the comfortable authomatic plotting, so some things should be done manually:
+There are three available kinds of plots:
+1. Two-dimensional contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied;
+2. Cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`);
+3. Artsy canvas version of the water depth `h` 2D contour plot
 
-* Specify the number of cells you used in the `m_parameters.f90` module inside the script `plot/plot.py` or `plot/contourplot.py`, depending on which type of plot you wish to draw.
+In order to plot the solution:
 
-    Example:
+* First, make sure that in your terminal, you are in the root directory of the git repository so that you could use the Makefile.
 
-    ```python
-    n_x = 500
-    n_y = 500
-    ```
-* Make sure that in your terminal, you are in the main directory of the repo so that you could use the Makefile.
-
-* To draw a full 2D contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied, use the following make command:
-
-    ```shell
-    make contour_plot
-    ```
-
-  The image file will be saved as `schlieren-2d.png` in the `plot/` directory.
-
-
-* To draw a 1D cross-section of the 2D data along the x axis:
+* Then, to draw all the plots mentioned above, use the following command:
 
     ```shell
     make plot
     ```
 
-  The image file will be saved as `huvetaw-1d.png` in the `plot/` directory.
+  They will appear as `schlieren-2d.png` `huvetaw-1d.png` and `artsy.png` in the `img/` directory.
 
+### Intermediate output plots and videos
+If you chose to output intermediate simulation data, you can generate images from it:
+```zsh
+make generate_images
+```
+which will appear in the `img/` directory, and also, to compile an `.mp4` video out of them:
+
+```zsh
+make generate_video
+```
+which will be saved in the `vid/` folder.
+
+### Bonus: custom image of your choice as initial data for simulations
+
+Imagine possessing the ability to freeze time and utilize a 3D printer to generate an initial configuration of a fluid surface. Upon uploading any picture, the printer converts it to grayscale, with darker pixels indicating higher elevations on the surface. This grayscale image serves as the starting point for a numerical simulation. And then you press the play button and let it gracefully disintegrate over time.
+
+Good news is that you actually have this 3D printer in the `pic-data.py` script. You can choose whatever picture you want, put it to the `img/` directory under the name `input.jpg`, and generate the initial data by executing the command:
+
+```zsh
+make generate_matrix
+```
+
+Then, set the `SELECTOR_IC` to `IC_MATRIX` in the `m_parameters.f90` module and run the simulation as described in the above sections.
 
 
 ## Guidelines for repository contributors
