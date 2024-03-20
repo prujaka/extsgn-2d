@@ -15,7 +15,7 @@ data = np.asarray(image)
 # image_test = Image.fromarray(matrix*255)
 # image_test.save('image-test.jpg')
 
-matrix = ((np.amax(data) - data) / np.amax(data)) + 1
+matrix = ((np.amax(data) - data) / np.amax(data))
 plt.imshow(matrix, interpolation='nearest')
 plt.savefig('img/image-test.png')
 # image_test = Image.fromarray(matrix*255)
