@@ -1,7 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 from matplotlib.colors import LinearSegmentedColormap
+import plotly.graph_objects as go
+import random
 
 
 def get_meshsize(parameters_path='src/m_parameters.f90'):
@@ -123,6 +124,26 @@ class Solution:
 
         plt.savefig(file, dpi=300)
         plt.close()
+
+    def plot_3d_surface(self, file):
+        fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
+                                         colorscale='blues')])
+
+        camera = dict(
+            up=dict(x=0, y=0, z=1),
+            center=dict(x=0, y=0, z=0),
+            eye=dict(x=0, y=0, z=1.5),
+        )
+
+        fig.update_layout(
+            scene=dict(zaxis=dict(nticks=1, range=[0, 4], title='')),
+            width=700, height=700,
+            scene_camera=camera,
+            margin=dict(r=10, l=10, b=10, t=10)
+        )
+
+        fig.show()
+        fig.write_image(file)
 
 
 if __name__ == '__main__':
