@@ -98,7 +98,8 @@ A simple makefile is used:
 There are three available kinds of plots:
 1. Two-dimensional contour plot of the water depth `h` with the numerical schlieren filter `log(1 + log(1 + 25*|grad h|))` applied;
 2. Cross-section plot of the 2D data corresponding to the points sampled from the horizontal axis (`y = 0`);
-3. Artsy canvas version of the water depth `h` 2D contour plot
+3. Artsy canvas version of the water depth `h` 2D contour plot;
+4. 3D surface plot of the water depth `h`.
 
 In order to plot the solution:
 
