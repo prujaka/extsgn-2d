@@ -27,5 +27,6 @@ with open('out/init_matrix.dat', 'w') as f:
             f.write(str(matrix[i, j]))
             f.write('\n')
 
-print(matrix)
-print(np.amax(data))
+round_2 = np.vectorize(lambda x: round(x, 2))
+
+print(round_2(matrix))
