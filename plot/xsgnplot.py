@@ -125,9 +125,9 @@ class Solution:
         plt.savefig(file, dpi=300)
         plt.close()
 
-    def plot_3d_surface(self, file):
+    def plot_3d_surface(self, file, cmap='blues'):
         fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
-                                         colorscale='blues')])
+                                         colorscale=cmap)])
 
         camera = dict(
             up=dict(x=0, y=0, z=1),
@@ -157,4 +157,4 @@ if __name__ == '__main__':
     solution.plot_sections(png_1d_sections)
     solution.plot_artsy(png_2d_artsy, cmap=cmap)
     solution.plot_schlieren(png_2d_schlieren)
-    solution.plot_3d_surface(png_3d_surface)
+    solution.plot_3d_surface(png_3d_surface, cmap='blues_r')
