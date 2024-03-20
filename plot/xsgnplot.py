@@ -148,12 +148,14 @@ class Solution:
 
 if __name__ == '__main__':
     file = 'out/res.dat'
-    png = 'img/schlieren-2d.png'
-    png_artsy = 'img/artsy.png'
-    png_1d = 'img/huvetaw-1d.png'
+    png_1d_sections = 'img/plot_1d_sections.png'
+    png_2d_schlieren = 'img/plot_2d_schlieren.png'
+    png_2d_artsy = 'img/plot_2d_artsy.png'
+    png_3d_surface = 'img/plot_3d_surface.png'
     solution = Solution(file)
 
     cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
-    solution.plot_artsy(png_artsy, cmap=cmap)
-    solution.plot_schlieren(png)
-    solution.plot_sections(png_1d)
+    solution.plot_sections(png_1d_sections)
+    solution.plot_artsy(png_2d_artsy, cmap=cmap)
+    solution.plot_schlieren(png_2d_schlieren)
+    solution.plot_3d_surface(png_3d_surface)
