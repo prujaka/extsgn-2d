@@ -111,7 +111,7 @@ In order to plot the solution:
     make plot
     ```
 
-  They will appear as `schlieren-2d.png` `huvetaw-1d.png` and `artsy.png` in the `img/` directory.
+  They will appear as `plot_1d_sections.png`, `plot_2d_schlieren.png`, `plot_2d_artsy.png` and `plot_3d_surface.png` in the `img/` directory.
 
 ### Intermediate output plots and videos
 If you chose to output intermediate simulation data, you can generate images from it:
