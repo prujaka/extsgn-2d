@@ -60,10 +60,10 @@ generate_matrix:
 	@python plot/pic-data.py
 
 rm_seq:
-	@rm out/*_t=*.dat
+	@rm -f out/*_t=*.dat
 
 rm_img_seq:
-	@rm img/*_t=*.png
+	@rm -f img/*_t=*.png
 
 clean_sequences:
 	@make rm_seq
