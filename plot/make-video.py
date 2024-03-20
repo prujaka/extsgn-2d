@@ -36,7 +36,8 @@ if __name__ == "__main__":
     output_gif_path = "vid/output_gif.gif"
     duration_seconds = 15
 
-    create_video(png_files, output_video_path, duration_seconds)
-    # create_gif(png_files, output_gif_path, duration_seconds)
+    print('Starting video compilation from images.\n')
 
-    print(f"Video created at: {output_video_path}")
+    create_video(png_files, output_video_path, duration_seconds)
+
+    print(f"\nVideo created at: {output_video_path}")
