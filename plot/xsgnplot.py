@@ -142,7 +142,6 @@ class Solution:
             margin=dict(r=10, l=10, b=10, t=10)
         )
 
-        fig.show()
         fig.write_image(file)
 
 
