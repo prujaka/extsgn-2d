@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 import plotly.graph_objects as go
-import random
 
 
 def get_meshsize(parameters_path='src/m_parameters.f90'):
@@ -116,9 +115,17 @@ class Solution:
         plt.savefig(file, dpi=300)
         plt.close()
 
-    def plot_3d_surface(self, file, cmap='blues'):
-        fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
-                                         colorscale=cmap)])
+    def plot_3d_surface(self, file, colorscale='blues_r',
+                        colorscale_limits=None):
+        try:
+            cmin = colorscale_limits[0]
+            cmax = colorscale_limits[1]
+            fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
+                                             colorscale=colorscale,
+                                             cmin=cmin, cmax=cmax)])
+        except TypeError:
+            fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
+                                             colorscale=colorscale)])
 
         camera = dict(
             up=dict(x=0, y=0, z=1),
@@ -145,7 +152,8 @@ if __name__ == '__main__':
     solution = Solution(file)
 
     cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
+
     solution.plot_sections(png_1d_sections)
     solution.plot_artsy(png_2d_artsy, cmap=cmap)
     solution.plot_schlieren(png_2d_schlieren)
-    solution.plot_3d_surface(png_3d_surface, cmap='blues_r')
+    solution.plot_3d_surface(png_3d_surface)
