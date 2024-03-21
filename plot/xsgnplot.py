@@ -28,15 +28,6 @@ def truncate_colormap(cmap_name, cutoff_percentage=0.8):
     return truncated_cmap
 
 
-def create_testdata(file, nx=10, ny=5):
-    with open(file, 'w') as f:
-        for i in range(nx):
-            for j in range(ny):
-                rand = round(random.uniform(-0.2, 0.2), 2)
-                s = ' '.join(map(str, [i, j, 1 + rand]))
-                f.write(s + '\n')
-
-
 class Solution:
     def __init__(self, file):
         x, y, h, u, v, eta, w, t = np.loadtxt(file, unpack=True)
