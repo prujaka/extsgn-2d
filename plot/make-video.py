@@ -1,7 +1,6 @@
 import cv2
 import os
 from os.path import isfile, join
-import imageio
 
 
 def create_video(png_files, output_video_path, duration_seconds, fps=24):
@@ -26,21 +25,6 @@ def create_video(png_files, output_video_path, duration_seconds, fps=24):
     video_writer.release()
 
 
-def create_gif(png_files, output_gif_path, duration_seconds):
-    # Read the first image to get dimensions
-    first_image = imageio.imread(png_files[0])
-    height, width, _ = first_image.shape
-
-    # Create the GIF file with a specified duration
-    with imageio.get_writer(output_gif_path,
-                            duration=duration_seconds) as gif_writer:
-        for i, png_file in enumerate(png_files):
-            frame = imageio.imread(png_file)
-            gif_writer.append_data(frame)
-            print(f'Image {png_file} added to the gif,'
-                  f'{i + 1}/{len(png_files)}')
-
-
 if __name__ == "__main__":
     img_dir = 'img'
     png_files = [join(img_dir, f) for f in os.listdir(img_dir)
@@ -52,7 +36,8 @@ if __name__ == "__main__":
     output_gif_path = "vid/output_gif.gif"
     duration_seconds = 15
 
-    create_video(png_files, output_video_path, duration_seconds)
-    # create_gif(png_files, output_gif_path, duration_seconds)
+    print('Starting video compilation from images.\n')
 
-    print(f"Video created at: {output_video_path}")
+    create_video(png_files, output_video_path, duration_seconds)
+
+    print(f"\nVideo created at: {output_video_path}")

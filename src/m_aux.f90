@@ -47,7 +47,7 @@ contains
     do i=1, NX
       do j=1, NY
         read(10, *) a
-        prim(1,i,j) = HL_INIT + (HL_INIT - HR_INIT)*a
+        prim(1,i,j) = HR_INIT + (HL_INIT - HR_INIT)*a
         prim(2,i,j) = 0.d0
         prim(3,i,j) = 0.d0
         prim(4,i,j) = prim(1,i,j)

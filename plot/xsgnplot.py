@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import random
 from matplotlib.colors import LinearSegmentedColormap
+import plotly.graph_objects as go
 
 
 def get_meshsize(parameters_path='src/m_parameters.f90'):
@@ -25,15 +25,6 @@ def truncate_colormap(cmap_name, cutoff_percentage=0.8):
                                                        new_colors)
 
     return truncated_cmap
-
-
-def create_testdata(file, nx=10, ny=5):
-    with open(file, 'w') as f:
-        for i in range(nx):
-            for j in range(ny):
-                rand = round(random.uniform(-0.2, 0.2), 2)
-                s = ' '.join(map(str, [i, j, 1 + rand]))
-                f.write(s + '\n')
 
 
 class Solution:
@@ -124,15 +115,45 @@ class Solution:
         plt.savefig(file, dpi=300)
         plt.close()
 
+    def plot_3d_surface(self, file, colorscale='blues_r',
+                        colorscale_limits=None):
+        try:
+            cmin = colorscale_limits[0]
+            cmax = colorscale_limits[1]
+            fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
+                                             colorscale=colorscale,
+                                             cmin=cmin, cmax=cmax)])
+        except TypeError:
+            fig = go.Figure(data=[go.Surface(x=-self.x, y=-self.y, z=self.h,
+                                             colorscale=colorscale)])
+
+        camera = dict(
+            up=dict(x=0, y=0, z=1),
+            center=dict(x=0, y=0, z=0),
+            eye=dict(x=0, y=0, z=1.5),
+        )
+
+        fig.update_layout(
+            scene=dict(zaxis=dict(nticks=1, range=[0, 4], title='')),
+            width=700, height=700,
+            scene_camera=camera,
+            margin=dict(r=10, l=10, b=10, t=10)
+        )
+
+        fig.write_image(file)
+
 
 if __name__ == '__main__':
     file = 'out/res.dat'
-    png = 'img/schlieren-2d.png'
-    png_artsy = 'img/artsy.png'
-    png_1d = 'img/huvetaw-1d.png'
+    png_1d_sections = 'img/plot_1d_sections.png'
+    png_2d_schlieren = 'img/plot_2d_schlieren.png'
+    png_2d_artsy = 'img/plot_2d_artsy.png'
+    png_3d_surface = 'img/plot_3d_surface.png'
     solution = Solution(file)
 
     cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
-    solution.plot_artsy(png_artsy, cmap=cmap)
-    solution.plot_schlieren(png)
-    solution.plot_sections(png_1d)
+
+    solution.plot_sections(png_1d_sections)
+    solution.plot_artsy(png_2d_artsy, cmap=cmap)
+    solution.plot_schlieren(png_2d_schlieren)
+    solution.plot_3d_surface(png_3d_surface)

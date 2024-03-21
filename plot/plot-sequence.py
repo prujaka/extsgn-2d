@@ -20,14 +20,16 @@ if __name__ == '__main__':
     h_max = max(maxs)
     h_min = min(mins)
 
-    print(h_min, h_max)
-
     color_norm = Normalize(vmin=h_min, vmax=h_max)
-
     cmap = truncate_colormap('ocean_r', cutoff_percentage=0.8)
+    colorscale_limits = (h_min, h_max)
 
+    print('Starting image generation from output data.\n')
     for (i, file) in enumerate(data_files):
         res = Solution(file)
         img_file = file.replace('out', 'img').replace('.dat', '.png')
-        res.plot_artsy(img_file, cmap=cmap, norm=color_norm)
+        # res.plot_artsy(img_file, cmap=cmap, norm=color_norm)
+        res.plot_3d_surface(img_file, colorscale_limits=colorscale_limits)
         print(f'Generating {img_file}, {i + 1} out of {len(data_files)}')
+
+    print('\nDone! All images are generated.')
