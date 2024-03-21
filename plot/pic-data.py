@@ -7,8 +7,8 @@ from xsgnplot import get_meshsize
 nx, ny = get_meshsize()
 image = Image.open('img/input.jpg')
 image = image.resize((nx, ny))
-image = image.convert('L')
-data = np.asarray(image)
+image_grayscale = image.convert('L')
+data = np.asarray(image_grayscale)
 
 # threshold = 50
 # matrix = (data < threshold).astype(dtype=np.uint8)
